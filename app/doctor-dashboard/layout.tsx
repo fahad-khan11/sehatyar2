@@ -1,11 +1,12 @@
 "use client";
 import { Toaster } from "sonner";
-import { AdminDashboardLayout } from "@/components/Admin-dashboard-layout";
+
+import { DoctorDashboardLayout } from "@/components/doctor-dashboard-layout";
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <AdminDashboardLayout>
+    <DoctorDashboardLayout>
       <Toaster richColors position="top-right" />
       {children}
-    </AdminDashboardLayout>
+    </DoctorDashboardLayout>
   );
 }

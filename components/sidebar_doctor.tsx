@@ -39,44 +39,44 @@ export function Doctor_Sidebar({ isOpen, setIsOpen }: SidebarProps) {
     
     },
    
-    {
-      title: "Doctors",
-      href: "/doctors",
-      icon: Users,
-      submenu: [
-        { title: "Doctors List", href: "/admin-dashboard/doctors" },
+    // {
+    //   title: "Doctors",
+    //   href: "/doctors",
+    //   icon: Users,
+    //   submenu: [
+    //     { title: "Doctors List", href: "/doctor-dashboard/doctors" },
     
-      ],
-    },
-     {
-      title: "Individual Doctors",
-      href: "/doctors",
-      icon: Users,
-      submenu: [
-        { title: "Doctors List", href: "/admin-dashboard/doctors" },
-        { title: "Add Doctor", href: "/admin-dashboard/doctors/add" },
+    //   ],
+    // },
+    //  {
+    //   title: "Individual Doctors",
+    //   href: "/doctors",
+    //   icon: Users,
+    //   submenu: [
+    //     { title: "Doctors List", href: "/doctor-dashboard/doctors" },
+    //     { title: "Add Doctor", href: "/doctor-dashboard/doctors/add" },
 
     
-      ],
-    },
+    //   ],
+    // },
     {
       title: "Receptionist",
-      href: "/admin-dashboard/receptionists",
+      href: "/doctor-dashboard/receptionists",
       icon: UserRound,
     },
     {
       title: "Patients",
-      href: "/admin-dashboard/patients",
+      href: "/doctor-dashboard/patients",
       icon: UserRound,
     },
     {
       title: "Appointments",
-      href: "/admin-dashboard/appointments",
+      href: "/doctor-dashboard/appointments",
       icon: Calendar,
       submenu: [
-        { title: "All Appointments", href: "/admin-dashboard/appointments" },
+        { title: "All Appointments", href: "/doctor-dashboard/appointments" },
         // { title: "Add Appointment", href: "/appointments/add" },
-        { title: "Calendar View", href: "/admin-dashboard/appointments/calendar" },
+        { title: "Calendar View", href: "/doctor-dashboard/appointments/calendar" },
         // { title: "Appointment Requests", href: "/appointments/requests" },
       ],
     },
@@ -117,17 +117,17 @@ export function Doctor_Sidebar({ isOpen, setIsOpen }: SidebarProps) {
     //     { title: "Issue Blood", href: "/blood-bank/issue" },
     //   ],
     // },
-    {
-      title: "Billing",
-      href: "/admin-dashboard/billing",
-      icon: Receipt,
-      submenu: [
-        { title: "Invoices List", href: "/admin-dashboard/billing" },
-        { title: "Create Invoice", href: "/admin-dashboard/billing/create" },
-        { title: "Payments History", href: "/admin-dashboard/billing/payments" },
-        // { title: "Insurance Claims", href: "/billing/insurance" },
-      ],
-    },
+    // {
+    //   title: "Billing",
+    //   href: "/doctor-dashboard/billing",
+    //   icon: Receipt,
+    //   submenu: [
+    //     { title: "Invoices List", href: "/doctor-dashboard/billing" },
+    //     { title: "Create Invoice", href: "/doctor-dashboard/billing/create" },
+    //     { title: "Payments History", href: "/doctor-dashboard/billing/payments" },
+    //     // { title: "Insurance Claims", href: "/billing/insurance" },
+    //   ],
+    // },
     // {
     //   title: "Departments",
     //   href: "/departments",
@@ -182,11 +182,11 @@ export function Doctor_Sidebar({ isOpen, setIsOpen }: SidebarProps) {
     // },
     {
       title: "Reviews",
-      href: "/admin-dashboard/reviews",
+      href: "/doctor-dashboard/reviews",
       icon: Star,
       submenu: [
-        { title: "Doctor Reviews", href: "/admin-dashboard/reviews/doctors" },
-        { title: "Patient Reviews", href: "/admin-dashboard/reviews/patients" },
+        { title: "Doctor Reviews", href: "/doctor-dashboard/reviews/doctors" },
+        { title: "Patient Reviews", href: "/doctor-dashboard/reviews/patients" },
       ],
     },
     // {
@@ -196,25 +196,25 @@ export function Doctor_Sidebar({ isOpen, setIsOpen }: SidebarProps) {
     // },
     {
       title: "Reports",
-      href: "/admin-dashboard/reports",
+      href: "/doctor-dashboard/reports",
       icon: BarChart3,
       submenu: [
-        { title: "Overview", href: "/admin-dashboard/reports" },
-        { title: "Appointment Reports", href: "/admin-dashboard/reports/appointments" },
-        { title: "Financial Reports", href: "/admin-dashboard/reports/financial" },
+        { title: "Overview", href: "/doctor-dashboard/reports" },
+        { title: "Appointment Reports", href: "/doctor-dashboard/reports/appointments" },
+        { title: "Financial Reports", href: "/doctor-dashboard/reports/financial" },
         // { title: "Inventory Reports", href: "/reports/inventory" },
-        { title: "Patient Visit Reports", href: "/admin-dashboard/reports/patients" },
+        { title: "Patient Visit Reports", href: "/doctor-dashboard/reports/patients" },
       ],
     },
     {
       title: "Settings",
-      href: "/admin-dashboard/settings",
+      href: "/doctor-dashboard/settings",
       icon: Settings,
       submenu: [
-        { title: "General Settings", href: "/admin-dashboard/settings" },
-        { title: "Notifications", href: "/admin-dashboard/settings/notifications" },
-        { title: "Working Hours", href: "/admin-dashboard/settings/hours" },
-        { title: "Integrations", href: "/admin-dashboard/settings/integrations" },
+        { title: "General Settings", href: "/doctor-dashboard/settings" },
+        { title: "Notifications", href: "/doctor-dashboard/settings/notifications" },
+        { title: "Working Hours", href: "/doctor-dashboard/settings/hours" },
+        { title: "Integrations", href: "/doctor-dashboard/settings/integrations" },
       ],
     },
     // {
@@ -231,7 +231,7 @@ export function Doctor_Sidebar({ isOpen, setIsOpen }: SidebarProps) {
 
     {
       title: "Calendar",
-      href: "/admin-dashboard/calendar",
+      href: "/doctor-dashboard/calendar",
       icon: Calendar1,
     },
     // {
@@ -241,7 +241,7 @@ export function Doctor_Sidebar({ isOpen, setIsOpen }: SidebarProps) {
     // },
     {
       title: "Contacts",
-      href: "/admin-dashboard/contact",
+      href: "/doctor-dashboard/contact",
       icon: UserRound,
     },
     // {
@@ -251,7 +251,7 @@ export function Doctor_Sidebar({ isOpen, setIsOpen }: SidebarProps) {
     // },
     {
       title: "Chat",
-      href: "/admin-dashboard/chat",
+      href: "/doctor-dashboard/chat",
       icon: MessageCircle,
     },
     // {
