@@ -42,8 +42,8 @@ export function Patient_Sidebar({ isOpen, setIsOpen }: SidebarProps) {
     //   href: "/clinics",
     //   icon: Building2,
     //   submenu: [
-    //     { title: "Clinics List", href: "/admin-dashboard/clinics" },
-    //     { title: "Add Clinic", href: "/admin-dashboard/clinics/add" },
+    //     { title: "Clinics List", href: "/patient-dashboard/clinics" },
+    //     { title: "Add Clinic", href: "/patient-dashboard/clinics/add" },
     //   ],
     // },
     // {
@@ -51,7 +51,7 @@ export function Patient_Sidebar({ isOpen, setIsOpen }: SidebarProps) {
     //   href: "/doctors",
     //   icon: Users,
     //   submenu: [
-    //     { title: "Doctors List", href: "/admin-dashboard/doctors" },
+    //     { title: "Doctors List", href: "/patient-dashboard/doctors" },
     
     //   ],
     // },
@@ -60,20 +60,20 @@ export function Patient_Sidebar({ isOpen, setIsOpen }: SidebarProps) {
     //   href: "/doctors",
     //   icon: Users,
     //   submenu: [
-    //     { title: "Doctors List", href: "/admin-dashboard/doctors" },
-    //     { title: "Add Doctor", href: "/admin-dashboard/doctors/add" },
+    //     { title: "Doctors List", href: "/patient-dashboard/doctors" },
+    //     { title: "Add Doctor", href: "/patient-dashboard/doctors/add" },
 
     
     //   ],
     // },
     // {
     //   title: "Receptionist",
-    //   href: "/admin-dashboard/receptionists",
+    //   href: "/patient-dashboard/receptionists",
     //   icon: UserRound,
     // },
     // {
     //   title: "Patients",
-    //   href: "/admin-dashboard/patients",
+    //   href: "/patient-dashboard/patients",
     //   icon: UserRound,
     // },
     {
@@ -85,6 +85,15 @@ export function Patient_Sidebar({ isOpen, setIsOpen }: SidebarProps) {
         // { title: "Add Appointment", href: "/appointments/add" },
         { title: "Calendar View", href: "/patient-dashboard/appointments/calendar" },
         // { title: "Appointment Requests", href: "/appointments/requests" },
+      ],
+    },
+    {
+      title: "Medical Records",
+      href: "/patient-dashboard/medical-records",
+      icon: FileText,
+      submenu: [
+        { title: "All Records", href: "/patient-dashboard/medical-records" },
+        { title: "Upload Records", href: "/patient-dashboard/medical-records/upload" },
       ],
     },
     // {
@@ -126,12 +135,12 @@ export function Patient_Sidebar({ isOpen, setIsOpen }: SidebarProps) {
     // },
     // {
     //   title: "Billing",
-    //   href: "/admin-dashboard/billing",
+    //   href: "/patient-dashboard/billing",
     //   icon: Receipt,
     //   submenu: [
-    //     { title: "Invoices List", href: "/admin-dashboard/billing" },
-    //     { title: "Create Invoice", href: "/admin-dashboard/billing/create" },
-    //     { title: "Payments History", href: "/admin-dashboard/billing/payments" },
+    //     { title: "Invoices List", href: "/patient-dashboard/billing" },
+    //     { title: "Create Invoice", href: "/patient-dashboard/billing/create" },
+    //     { title: "Payments History", href: "/patient-dashboard/billing/payments" },
     //     // { title: "Insurance Claims", href: "/billing/insurance" },
     //   ],
     // },
@@ -187,31 +196,37 @@ export function Patient_Sidebar({ isOpen, setIsOpen }: SidebarProps) {
     //     { title: "Add New Room", href: "/rooms/add" },
     //   ],
     // },
-    {
-      title: "Reviews",
-      href: "/admin-dashboard/reviews",
-      icon: Star,
-      submenu: [
-        { title: "Doctor Reviews", href: "/admin-dashboard/reviews/doctors" },
-        { title: "Patient Reviews", href: "/admin-dashboard/reviews/patients" },
-      ],
-    },
+    // {
+    //   title: "Reviews",
+    //   href: "/patient-dashboard/reviews",
+    //   icon: Star,
+    //   submenu: [
+    //     { title: "Doctor Reviews", href: "/patient-dashboard/reviews/doctors" },
+    //     { title: "Patient Reviews", href: "/patient-dashboard/reviews/patients" },
+    //   ],
+    // },
     // {
     //   title: "Feedback",
     //   href: "/feedback",
     //   icon: MessageSquare,
     // },
-    {
-      title: "Reports",
-      href: "/admin-dashboard/reports",
-      icon: BarChart3,
-      submenu: [
-        { title: "Overview", href: "/admin-dashboard/reports" },
-        { title: "Appointment Reports", href: "/admin-dashboard/reports/appointments" },
-        { title: "Financial Reports", href: "/admin-dashboard/reports/financial" },
-        // { title: "Inventory Reports", href: "/reports/inventory" },
-        { title: "Patient Visit Reports", href: "/admin-dashboard/reports/patients" },
-      ],
+    // {
+    //   title: "Reports",
+    //   href: "/patient-dashboard/reports",
+    //   icon: BarChart3,
+    //   submenu: [
+    //     { title: "Overview", href: "/patient-dashboard/reports" },
+    //     { title: "Appointment Reports", href: "/patient-dashboard/reports/appointments" },
+    //     { title: "Financial Reports", href: "/patient-dashboard/reports/financial" },
+    //     // { title: "Inventory Reports", href: "/reports/inventory" },
+    //     { title: "Patient Visit Reports", href: "/patient-dashboard/reports/patients" },
+    //   ],
+    // },
+
+     {
+      title: "Chat",
+      href: "/patient-dashboard/chat",
+      icon: MessageCircle,
     },
     {
       title: "Settings",
@@ -248,7 +263,7 @@ export function Patient_Sidebar({ isOpen, setIsOpen }: SidebarProps) {
     // },
     // {
     //   title: "Contacts",
-    //   href: "/admin-dashboard/contact",
+    //   href: "/patient-dashboard/contact",
     //   icon: UserRound,
     // },
     // {
@@ -256,11 +271,7 @@ export function Patient_Sidebar({ isOpen, setIsOpen }: SidebarProps) {
     //   href: "/email",
     //   icon: Mail,
     // },
-    {
-      title: "Chat",
-      href: "/patient-dashboard/chat",
-      icon: MessageCircle,
-    },
+   
     // {
     //   title: "Support",
     //   href: "/support",
