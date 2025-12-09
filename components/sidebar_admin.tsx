@@ -61,8 +61,8 @@ export function Admin_Sidebar({ isOpen, setIsOpen }: SidebarProps) {
       href: "/doctors",
       icon: Users,
       submenu: [
-        { title: "Doctors List", href: "/admin-dashboard/doctors" },
-        { title: "Add Doctor", href: "/admin-dashboard/doctors/add" },
+        { title: "Doctors List", href: "/admin-dashboard/individual-doctors" },
+        { title: "Add Doctor", href: "/admin-dashboard/individual-doctors/add" },
 
     
       ],

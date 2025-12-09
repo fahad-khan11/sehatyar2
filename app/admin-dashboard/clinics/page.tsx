@@ -14,36 +14,34 @@ import { Plus, Search } from "lucide-react";
 import Link from "next/link";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { useEffect,useState } from "react";
+import { getClinics } from "@/lib/api/admin";
 
-// Mock data for clinics
-const clinics = [
-  {
-    id: 1,
-    name: "Central City Clinic",
-    address: "123 Main St, New York, NY",
-    contact: "+1 (555) 123-4567",
-    email: "contact@centralclinic.com",
-    status: "Active",
-  },
-  {
-    id: 2,
-    name: "Westside Health Center",
-    address: "456 West Ave, Los Angeles, CA",
-    contact: "+1 (555) 987-6543",
-    email: "info@westsidehealth.com",
-    status: "Active",
-  },
-  {
-    id: 3,
-    name: "North Hills Medical",
-    address: "789 North Blvd, Chicago, IL",
-    contact: "+1 (555) 456-7890",
-    email: "support@northhills.com",
-    status: "Inactive",
-  },
-];
+
+
 
 export default function ClinicsPage() {
+
+  const [clinics, setClinics] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchClinics = async () => {
+      try {
+        setIsLoading(true);
+        const fetchedClinics = await getClinics();
+        setClinics(fetchedClinics);
+      } catch (err) {
+        setError("Failed to fetch clinics.");
+        console.error(err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchClinics();
+  }, []);
+
   return (
     <div className="flex flex-col gap-5">
       <div className="flex items-center justify-between">
@@ -83,32 +81,48 @@ export default function ClinicsPage() {
             <TableHeader>
               <TableRow>
                 <TableHead>Name</TableHead>
+                <TableHead>Phone</TableHead>
                 <TableHead>Address</TableHead>
-                <TableHead>Contact</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {clinics.map((clinic) => (
+              {isLoading && (
+                <TableRow>
+                  <TableCell colSpan={5} className="text-center py-8">
+                    Loading clinics...
+                  </TableCell>
+                </TableRow>
+              )}
+              {error && (
+                <TableRow>
+                  <TableCell colSpan={5} className="text-center py-8 text-destructive">
+                    {error}
+                  </TableCell>
+                </TableRow>
+              )}
+              {!isLoading && !error && clinics.length === 0 && (
+                <TableRow>
+                  <TableCell colSpan={5} className="text-center py-8">
+                    No clinics found.
+                  </TableCell>
+                </TableRow>
+              )}
+              {!isLoading && !error && clinics.map((clinic) => (
                 <TableRow key={clinic.id}>
                   <TableCell className="font-medium">{clinic.name}</TableCell>
+                  <TableCell>{clinic.phone}</TableCell>
                   <TableCell>{clinic.address}</TableCell>
                   <TableCell>
-                    <div className="flex flex-col text-sm">
-                      <span>{clinic.contact}</span>
-                      <span className="text-muted-foreground text-xs">{clinic.email}</span>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant={clinic.status === "Active" ? "default" : "secondary"}>
-                      {clinic.status}
+                    <Badge variant={clinic.isActive ? 'default' : 'secondary'}>
+                      {clinic.isActive ? 'Active' : 'Inactive'}
                     </Badge>
                   </TableCell>
                   <TableCell className="text-right">
-                    <Button variant="ghost" size="sm">
-                      Edit
-                    </Button>
+                    <Link href={`/admin-dashboard/clinics/${clinic.id}`}>
+                      <Button variant="ghost" size="sm">View</Button>
+                    </Link>
                   </TableCell>
                 </TableRow>
               ))}
@@ -119,3 +133,4 @@ export default function ClinicsPage() {
     </div>
   );
 }
+  

@@ -7,25 +7,18 @@ import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { toast } from "sonner";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import Link from "next/link";
 import { ChevronLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { createClinic } from "@/lib/api/admin";
 
 const formSchema = z.object({
   name: z.string().min(2, {
@@ -40,8 +33,8 @@ const formSchema = z.object({
   email: z.string().email({
     message: "Please enter a valid email address.",
   }),
-  status: z.enum(["Active", "Inactive"], {
-    required_error: "Please select a status.",
+  password: z.string().min(6, {
+    message: "Password must be at least 6 characters.",
   }),
 });
 
@@ -54,23 +47,24 @@ export default function AddClinicPage() {
       address: "",
       phone: "",
       email: "",
-      status: "Active",
+      password: "",
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    // In a real app, you would send this data to your API
-    console.log(values);
-    toast.success("Clinic added successfully!");
-    // Simulate API delay
-    setTimeout(() => {
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    try {
+      await createClinic({ ...values, isDoctorClinic: false });
+      toast.success("Clinic added successfully!");
       router.push("/admin-dashboard/clinics");
-    }, 1000);
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to add clinic. Please try again.");
+    }
   }
 
   return (
-    <div className="flex flex-col gap-5">
-      <div className="flex items-center gap-2">
+    <div className="flex flex-col items-center gap-5">
+      <div className="flex w-full max-w-2xl items-center gap-2">
         <Link href="/admin-dashboard/clinics">
           <Button variant="ghost" size="icon">
             <ChevronLeft className="h-4 w-4" />
@@ -82,7 +76,7 @@ export default function AddClinicPage() {
         </div>
       </div>
 
-      <Card className="max-w-2xl">
+      <Card className="w-full max-w-2xl">
         <CardHeader>
           <CardTitle>Clinic Details</CardTitle>
           <CardDescription>
@@ -110,7 +104,7 @@ export default function AddClinicPage() {
                 name="address"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Address</FormLabel>
+                    <FormLabel>Clinic Address</FormLabel>
                     <FormControl>
                       <Input placeholder="e.g. 123 Main St, New York, NY" {...field} />
                     </FormControl>
@@ -118,58 +112,46 @@ export default function AddClinicPage() {
                   </FormItem>
                 )}
               />
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <FormField
-                  control={form.control}
-                  name="phone"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Phone Number</FormLabel>
-                      <FormControl>
-                        <Input placeholder="e.g. +1 (555) 123-4567" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="email"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Email Address</FormLabel>
-                      <FormControl>
-                        <Input placeholder="e.g. contact@clinic.com" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
               <FormField
                 control={form.control}
-                name="status"
+                name="email"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Status</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select status" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="Active">Active</SelectItem>
-                        <SelectItem value="Inactive">Inactive</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormDescription>
-                      Set the operational status of the clinic.
-                    </FormDescription>
+                    <FormLabel>Clinic Email</FormLabel>
+                    <FormControl>
+                      <Input placeholder="e.g. contact@clinic.com" {...field} />
+                    </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
+              <FormField
+                control={form.control}
+                name="phone"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Clinic Phone</FormLabel>
+                    <FormControl>
+                      <Input placeholder="e.g. +1 (555) 123-4567" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Clinic Password</FormLabel>
+                    <FormControl>
+                      <Input type="password" placeholder="Enter password" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
               <div className="flex justify-end gap-2">
                 <Link href="/admin-dashboard/clinics">
                   <Button variant="outline" type="button">

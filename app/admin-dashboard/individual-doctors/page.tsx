@@ -15,7 +15,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Download, Filter, MoreHorizontal, Plus, Search, X } from "lucide-react";
 import Link from "next/link";
 import { useState, useEffect } from "react";
-import { getDoctors } from "@/lib/api/admin";
+import { getIndividualDoctors } from "@/lib/api/admin";
 
 export default function DoctorsPage() {
   const [doctors, setDoctors] = useState<any[]>([]);
@@ -34,7 +34,7 @@ export default function DoctorsPage() {
     const fetchDoctors = async () => {
       try {
         setIsLoading(true);
-        const data = await getDoctors();
+        const data = await getIndividualDoctors();
         setDoctors(data);
       } catch (err) {
         console.error(err);
