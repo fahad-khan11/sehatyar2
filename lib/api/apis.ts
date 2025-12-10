@@ -269,3 +269,66 @@ export const getReceptionistsByClinic = async () => {
     throw error;
   }
 };
+
+export const getAppointmentsByClinic = async () => {
+  try {
+    const accessToken = localStorage.getItem("access_token");
+    const response = await axios.get(`${BASE_URL}appointments/by/clinic`, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching appointments by clinic:", error);
+    throw error;
+  }
+};
+
+
+export const getAppointmentsByPatientId = async (id: string) => {
+  try {
+    const accessToken = localStorage.getItem("access_token");
+    const response = await axios.get(`${BASE_URL}appointments/patient/${id}`, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error(`Error fetching appointments for patient ${id}:`, error);
+    throw error;
+  }
+};
+
+export const getAppointmentById = async (id: string) => {
+  try {
+    const accessToken = localStorage.getItem("access_token");
+    const response = await axios.get(`${BASE_URL}appointments/patient/${id}`, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error(`Error fetching appointment ${id}:`, error);
+    throw error;
+  }
+};
+
+
+export const updateAppointmentFile = async (id: string, payload: FormData) => {
+  try {
+    const accessToken = localStorage.getItem("access_token");
+    const response = await axios.patch(`${BASE_URL}appointments/${id}`, payload, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error(`Error uploading file for appointment ${id}:`, error);
+    throw error;
+  }
+};

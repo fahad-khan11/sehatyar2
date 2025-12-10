@@ -11,8 +11,10 @@ import { Progress } from "@/components/ui/progress";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { ArrowLeft, Check, FileText, Upload, X, AlertCircle, Calendar } from "lucide-react";
 import Link from "next/link";
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import { cn } from "@/lib/utils";
+import { getAppointmentById, updateAppointmentFile } from "@/lib/api/apis";
+import router from "next/router";
 
 type UploadedFile = {
   file: File;
@@ -22,53 +24,37 @@ type UploadedFile = {
   preview?: string;
 };
 
-type Appointment = {
-  id: string;
-  date: string;
-  doctor: string;
-  type: string;
-  status: string;
-};
-
-// Sample completed appointments - replace with actual API call
-const completedAppointments: Appointment[] = [
-  {
-    id: "3",
-    date: "2023-07-15",
-    doctor: "Dr. Lisa Patel",
-    type: "Follow-up",
-    status: "Completed",
-  },
-  {
-    id: "7",
-    date: "2023-07-05",
-    doctor: "Dr. Jennifer Lee",
-    type: "Annual Physical",
-    status: "Completed",
-  },
-];
-
-const categories = [
-  "Lab Report",
-  "X-Ray",
-  "MRI",
-  "CT Scan",
-  "Ultrasound",
-  "Prescription",
-  "Medical Certificate",
-  "Discharge Summary",
-  "Other",
-];
 
 export default function UploadMedicalRecordsPage() {
-  const [selectedAppointment, setSelectedAppointment] = useState("");
-  const [category, setCategory] = useState("");
-  const [description, setDescription] = useState("");
   const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
   const [isDragging, setIsDragging] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
+  const [appointmentId, setAppointmentId] = useState<string>("");
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    const fetchAppointment = async () => {
+        const userStr = localStorage.getItem("user_data");
+        if (userStr) {
+             const user = JSON.parse(userStr);
+             if (user && user.id) {
+                 try {
+                     // The user requested to use getAppointmentById to fetch the list 
+                     // (since getAppointmentById currently points to /patient/{id} which returns a list)
+                     const data = await getAppointmentById(user.id);
+                     if (data && data.length > 0) {
+                         // Assuming we upload to the first/latest appointment since selection UI is removed
+                         setAppointmentId(data[0].id);
+                     }
+                 } catch (error) {
+                     console.error("Error fetching appointment for upload context:", error);
+                 }
+             }
+        }
+    };
+    fetchAppointment();
+  }, []);
 
   const handleDragOver = useCallback((e: React.DragEvent) => {
     e.preventDefault();
@@ -99,37 +85,10 @@ export default function UploadMedicalRecordsPage() {
       file,
       id: Math.random().toString(36).substr(2, 9),
       progress: 0,
-      status: "uploading" as const,
+      status: "success", // Initially mark simple drag/drop as success in UI until actual submit
     }));
 
     setUploadedFiles((prev) => [...prev, ...newFiles]);
-
-    // Simulate upload progress
-    newFiles.forEach((uploadedFile) => {
-      simulateUpload(uploadedFile.id);
-    });
-  };
-
-  const simulateUpload = (fileId: string) => {
-    let progress = 0;
-    const interval = setInterval(() => {
-      progress += 10;
-      setUploadedFiles((prev) =>
-        prev.map((f) =>
-          f.id === fileId
-            ? {
-                ...f,
-                progress,
-                status: progress >= 100 ? "success" : "uploading",
-              }
-            : f
-        )
-      );
-
-      if (progress >= 100) {
-        clearInterval(interval);
-      }
-    }, 200);
   };
 
   const removeFile = (fileId: string) => {
@@ -138,22 +97,49 @@ export default function UploadMedicalRecordsPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (uploadedFiles.length === 0) return;
+    
     setIsSubmitting(true);
 
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1500));
+    try {
+        const formData = new FormData();
+        const userStr = localStorage.getItem("user_data");
+        if (userStr) {
+             const user = JSON.parse(userStr);
+             if (user && user.id) {
+                 formData.append("userId", user.id);
+             }
+        }
+        
+        // Append all files. Backend likely expects 'medicalHistoryFiles' for multiple files 
+        // or loop if it handles array. Based on previous response examples, it's an array.
+        uploadedFiles.forEach((fileObj) => {
+            formData.append("medicalHistoryFiles", fileObj.file);
+        });
 
-    setIsSubmitting(false);
-    setSubmitSuccess(true);
+        if (!appointmentId) {
+            alert("No appointment found to upload to.");
+            setIsSubmitting(false);
+            return;
+        }
 
-    // Reset form after 2 seconds
-    setTimeout(() => {
-      setSelectedAppointment("");
-      setCategory("");
-      setDescription("");
-      setUploadedFiles([]);
-      setSubmitSuccess(false);
-    }, 2000);
+        // Use the ID fetched from getAppointmentById
+        await updateAppointmentFile(appointmentId, formData);
+        // Navigate to the medical records page after successful upload
+
+        setSubmitSuccess(true);
+        // Reset form after 2 seconds
+        setTimeout(() => {
+          setUploadedFiles([]);
+          setSubmitSuccess(false);
+        }, 2000);
+        
+    } catch (error) {
+        console.error("Upload failed", error);
+        alert("Failed to upload files. Please try again.");
+    } finally {
+        setIsSubmitting(false);
+    }
   };
 
   const formatFileSize = (bytes: number) => {
@@ -164,7 +150,7 @@ export default function UploadMedicalRecordsPage() {
     return Math.round(bytes / Math.pow(k, i) * 100) / 100 + " " + sizes[i];
   };
 
-  const canSubmit = selectedAppointment && category && uploadedFiles.length > 0 && uploadedFiles.every((f) => f.status === "success");
+  const canSubmit = uploadedFiles.length > 0;
 
   return (
     <div className="flex flex-col gap-5">
@@ -178,7 +164,7 @@ export default function UploadMedicalRecordsPage() {
             </Button>
             <h2 className="text-2xl lg:text-3xl font-bold tracking-tight">Upload Medical Records</h2>
           </div>
-          <p className="text-muted-foreground ml-12">Upload medical records and documents from your completed appointments.</p>
+          <p className="text-muted-foreground ml-12">Upload medical records and documents.</p>
         </div>
       </div>
 
@@ -192,70 +178,14 @@ export default function UploadMedicalRecordsPage() {
 
       <form onSubmit={handleSubmit}>
         <div className="grid gap-6">
-          {/* Appointment Selection */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Select Appointment</CardTitle>
-              <CardDescription>Choose the appointment these records are associated with.</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="appointment">Completed Appointment *</Label>
-                <Select value={selectedAppointment} onValueChange={setSelectedAppointment}>
-                  <SelectTrigger id="appointment">
-                    <SelectValue placeholder="Select an appointment" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {completedAppointments.map((appointment) => (
-                      <SelectItem key={appointment.id} value={appointment.id}>
-                        <div className="flex items-center gap-2">
-                          <Calendar className="h-4 w-4" />
-                          <span>
-                            {appointment.date} - {appointment.doctor} ({appointment.type})
-                          </span>
-                        </div>
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="category">Document Category *</Label>
-                <Select value={category} onValueChange={setCategory}>
-                  <SelectTrigger id="category">
-                    <SelectValue placeholder="Select category" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {categories.map((cat) => (
-                      <SelectItem key={cat} value={cat}>
-                        {cat}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="description">Description (Optional)</Label>
-                <Textarea
-                  id="description"
-                  placeholder="Add any additional notes or description about these records..."
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  rows={3}
-                />
-              </div>
-            </CardContent>
-          </Card>
-
           {/* File Upload */}
           <Card>
             <CardHeader>
               <CardTitle>Upload Files</CardTitle>
               <CardDescription>Upload medical records, reports, or related documents (PDF, JPG, PNG)</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-6">
+              
               {/* Drag and Drop Area */}
               <div
                 onDragOver={handleDragOver}
@@ -326,12 +256,6 @@ export default function UploadMedicalRecordsPage() {
                             </Button>
                           </div>
                         </div>
-                        {uploadedFile.status === "uploading" && (
-                          <div className="space-y-1">
-                            <Progress value={uploadedFile.progress} className="h-2" />
-                            <p className="text-xs text-muted-foreground">Uploading... {uploadedFile.progress}%</p>
-                          </div>
-                        )}
                       </div>
                     ))}
                   </div>

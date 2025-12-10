@@ -89,8 +89,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     
     // If logged in, prevent access to login page
     if (token && isPublicRoute) {
-         if (user?.role === UserRole.ADMIN) router.push("/admin-dashboard/clinics");
-         // Add other redirects as needed
+         if (user?.role === UserRole.ADMIN) {
+             router.push("/admin-dashboard/clinics");
+         } else if (user?.role === UserRole.DOCTOR || user?.role === UserRole.CLINICDOCTOR || user?.role === UserRole.INDIVIDUALDOCTOR) {
+             router.push("/doctor-dashboard");
+         } else if (user?.role === UserRole.RECEPTIONIST || user?.role === UserRole.CLINICRECEPTIONIST) {
+             router.push("/receptionist-dashboard");
+         } else if (user?.role === UserRole.PATIENT) {
+             router.push("/patient-dashboard");
+         } else if (user?.role === UserRole.CLINIC) {
+             router.push("/clinic-dashboard");
+         }
     }
 
   }, [token, pathname, isLoading, user]);

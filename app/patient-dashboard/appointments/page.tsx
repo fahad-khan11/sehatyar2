@@ -16,6 +16,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Calendar, Check, Clock, Download, Filter, MoreHorizontal, Plus, Search, X } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { getAppointmentsByPatientId } from "@/lib/api/apis";
+
 type Appointment = {
   id: string;
   patient: {
@@ -30,149 +32,6 @@ type Appointment = {
   duration: string;
   department: string;
 };
-// Initial appointments data
-const initialAppointments: Appointment[] = [
-  {
-    id: "1",
-    patient: {
-      name: "John Smith",
-      image: "/colorful-abstract-shapes.png",
-    },
-    doctor: "Dr. Sarah Johnson",
-    date: "2023-07-15",
-    time: "10:00 AM",
-    status: "Confirmed",
-    type: "Check-up",
-    duration: "30 min",
-    department: "General Medicine",
-  },
-  {
-    id: "2",
-    patient: {
-      name: "Emily Davis",
-      image: "/colorful-abstract-shapes.png",
-    },
-    doctor: "Dr. Michael Chen",
-    date: new Date().toISOString().split("T")[0], // Today's date
-    time: "11:30 AM",
-    status: "In Progress",
-    type: "Consultation",
-    duration: "45 min",
-    department: "Cardiology",
-  },
-  {
-    id: "3",
-    patient: {
-      name: "Robert Wilson",
-      image: "/user-3.png",
-    },
-    doctor: "Dr. Lisa Patel",
-    date: new Date().toISOString().split("T")[0], // Today's date
-    time: "02:15 PM",
-    status: "Completed",
-    type: "Follow-up",
-    duration: "20 min",
-    department: "Orthopedics",
-  },
-  {
-    id: "4",
-    patient: {
-      name: "Jessica Brown",
-      image: "/user-3.png",
-    },
-    doctor: "Dr. James Wilson",
-    date: "2023-07-25", // Future date
-    time: "09:00 AM",
-    status: "Confirmed",
-    type: "Dental Cleaning",
-    duration: "60 min",
-    department: "Dental",
-  },
-  {
-    id: "5",
-    patient: {
-      name: "Michael Johnson",
-      image: "/user-3.png",
-    },
-    doctor: "Dr. Emily Rodriguez",
-    date: "2023-07-28", // Future date
-    time: "10:30 AM",
-    status: "Confirmed",
-    type: "X-Ray",
-    duration: "15 min",
-    department: "Radiology",
-  },
-  {
-    id: "6",
-    patient: {
-      name: "Sarah Thompson",
-      image: "/user-3.png",
-    },
-    doctor: "Dr. Robert Kim",
-    date: "2023-07-10", // Past date
-    time: "01:45 PM",
-    status: "Cancelled",
-    type: "Therapy Session",
-    duration: "45 min",
-    department: "Psychiatry",
-  },
-  {
-    id: "7",
-    patient: {
-      name: "David Miller",
-      image: "/user-3.png",
-    },
-    doctor: "Dr. Jennifer Lee",
-    date: "2023-07-05", // Past date
-    time: "11:00 AM",
-    status: "Completed",
-    type: "Annual Physical",
-    duration: "60 min",
-    department: "General Medicine",
-  },
-  {
-    id: "8",
-    patient: {
-      name: "Amanda Clark",
-      image: "/user-3.png",
-    },
-    doctor: "Dr. Thomas Brown",
-    date: "2023-07-08", // Past date
-    time: "09:30 AM",
-    status: "Cancelled",
-    type: "Vaccination",
-    duration: "15 min",
-    department: "Pediatrics",
-  },
-  {
-    id: "9",
-    patient: {
-      name: "Kevin Martinez",
-      image: "/user-3.png",
-    },
-    doctor: "Dr. Sarah Johnson",
-    date: new Date(new Date().setDate(new Date().getDate() + 3)).toISOString().split("T")[0], // 3 days from now
-    time: "02:00 PM",
-    status: "Confirmed",
-    type: "Check-up",
-    duration: "30 min",
-    department: "General Medicine",
-  },
-  {
-    id: "10",
-    patient: {
-      name: "Sophia Wilson",
-      image: "/user-3.png",
-    },
-    doctor: "Dr. Michael Chen",
-    date: new Date(new Date().setDate(new Date().getDate() + 1)).toISOString().split("T")[0], // Tomorrow
-    time: "10:15 AM",
-    status: "Confirmed",
-    type: "Consultation",
-    duration: "45 min",
-    department: "Neurology",
-  },
-];
 
 // Get unique values for filter options
 function getUniqueValues<T>(data: T[], key: keyof T | string): string[] {
@@ -194,8 +53,8 @@ function getUniqueValues<T>(data: T[], key: keyof T | string): string[] {
 export default function AppointmentsPage() {
   const [activeTab, setActiveTab] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
-  const [appointments, setAppointments] = useState(initialAppointments);
-  const [filteredAppointments, setFilteredAppointments] = useState(initialAppointments);
+  const [appointments, setAppointments] = useState<Appointment[]>([]);
+  const [filteredAppointments, setFilteredAppointments] = useState<Appointment[]>([]);
   const [filters, setFilters] = useState<any>({
     status: [],
     type: [],
@@ -204,6 +63,42 @@ export default function AppointmentsPage() {
     duration: [],
   });
   const [isFiltersApplied, setIsFiltersApplied] = useState(false);
+  const [userId, setUserId] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchAppointments = async () => {
+      try {
+        const userStr = localStorage.getItem("user_data");
+        if (!userStr) return;
+
+        const user = JSON.parse(userStr);
+        if (user && user.id) {
+          setUserId(user.id);
+          const data = await getAppointmentsByPatientId(user.id);
+          const mappedAppointments = data.map((item: any) => ({
+            id: item.id.toString(),
+            patient: {
+              name: item.patientName,
+              image: "/user-2.png", // Or fetch from user profile if available
+            },
+            doctor: item.doctor?.user?.fullName || "Unknown Doctor",
+            date: item.appointmentDate ? item.appointmentDate.split("T")[0] : "",
+            time: item.appointmentTime,
+            status: item.status ? item.status.charAt(0).toUpperCase() + item.status.slice(1) : "Pending",
+            type: item.appointmentType || "Consultation", // Default to Consultation if null
+            duration: "30 min", // Default duration as it's not in the API response
+            department: item.doctor?.primarySpecialization?.[0] || "General",
+          }));
+          setAppointments(mappedAppointments);
+          setFilteredAppointments(mappedAppointments);
+        }
+      } catch (error) {
+        console.error("Failed to fetch appointments:", error);
+      }
+    };
+
+    fetchAppointments();
+  }, []);
 
   // Get unique values for filter options
   const statusOptions = getUniqueValues(appointments, "status");
@@ -214,7 +109,7 @@ export default function AppointmentsPage() {
   const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
   // Apply filters and search
   useEffect(() => {
-    let result = [...initialAppointments];
+    let result = [...appointments];
 
     // Apply tab filter first
     if (activeTab === "upcoming") {
@@ -269,7 +164,7 @@ export default function AppointmentsPage() {
 
     setIsFiltersApplied(hasActiveFilters);
     setFilteredAppointments(result);
-  }, [activeTab, searchTerm, filters]);
+  }, [activeTab, searchTerm, filters, appointments]);
 
   // Handle filter changes
   const handleFilterChange = (filterType: any, value: any) => {
@@ -529,62 +424,9 @@ export default function AppointmentsPage() {
                               <DropdownMenuContent align="end">
                                 <DropdownMenuLabel>Actions</DropdownMenuLabel>
                                 <DropdownMenuItem asChild>
-                                  <Link href={`/appointments/${appointment.id}`}>View details</Link>
+                                  <Link href={`/patient-dashboard/appointments/${userId}`}>View details</Link>
                                 </DropdownMenuItem>
-
-                                {appointment.status !== "Completed" && appointment.status !== "Cancelled" && (
-                                  <>
-                                    <DropdownMenuItem asChild>
-                                      <Link href={`/appointments/${appointment.id}/edit`}>Edit appointment</Link>
-                                    </DropdownMenuItem>
-                                    <DropdownMenuItem asChild>
-                                      <Link href={`/appointments/${appointment.id}/reschedule`}>Reschedule</Link>
-                                    </DropdownMenuItem>
-                                  </>
-                                )}
-
-                                {appointment.status === "Confirmed" && (
-                                  <DropdownMenuItem>
-                                    <Check className="mr-2 h-4 w-4" /> Mark as in progress
-                                  </DropdownMenuItem>
-                                )}
-
-                                {appointment.status === "In Progress" && (
-                                  <DropdownMenuItem>
-                                    <Check className="mr-2 h-4 w-4" /> Mark as completed
-                                  </DropdownMenuItem>
-                                )}
-
-                                {appointment.status === "Completed" && (
-                                  <>
-                                    <DropdownMenuItem>View medical record</DropdownMenuItem>
-                                    <DropdownMenuItem>Create follow-up</DropdownMenuItem>
-                                    <DropdownMenuSeparator />
-                                    <DropdownMenuItem>Generate invoice</DropdownMenuItem>
-                                  </>
-                                )}
-
-                                {appointment.status === "Cancelled" && (
-                                  <DropdownMenuItem asChild>
-                                    <Link href={`/appointments/${appointment.id}/reschedule`}>Reschedule appointment</Link>
-                                  </DropdownMenuItem>
-                                )}
-
-                                {appointment.status !== "Cancelled" && appointment.status !== "Completed" && (
-                                  <>
-                                    <DropdownMenuSeparator />
-                                    <DropdownMenuItem onClick={() => setCancelDialogOpen(true)} className="text-red-600">
-                                      Cancel appointment
-                                    </DropdownMenuItem>
-                                  </>
-                                )}
-
-                                {appointment.status === "Cancelled" && (
-                                  <>
-                                    <DropdownMenuSeparator />
-                                    <DropdownMenuItem className="text-red-600">Delete permanently</DropdownMenuItem>
-                                  </>
-                                )}
+                                <DropdownMenuItem>View medical record</DropdownMenuItem>
                               </DropdownMenuContent>
                             </DropdownMenu>
                           </TableCell>

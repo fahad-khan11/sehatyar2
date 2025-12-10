@@ -9,141 +9,103 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ArrowLeft, ChevronLeft, ChevronRight, Plus, XCircle } from "lucide-react";
 import Link from "next/link";
 import { useState, useEffect } from "react";
-import { getAppointmentsByPatientId } from "@/lib/api/apis";
+import { getAppointmentsByClinic } from "@/lib/api/apis";
 
 // Time slots for day view
 const timeSlots = ["08:00 AM", "09:00 AM", "10:00 AM", "11:00 AM", "12:00 PM", "01:00 PM", "02:00 PM", "03:00 PM", "04:00 PM", "05:00 PM"];
 
 // Days of the week
-const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 const shortDaysOfWeek = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
-// Function to get days in month
-const getDaysInMonth = (year: any, month: any) => {
-  return new Date(year, month + 1, 0).getDate();
-};
-
-// Function to get first day of month
-const getFirstDayOfMonth = (year: any, month: any) => {
-  return new Date(year, month, 1).getDay();
-};
-
-// Function to get status badge variant
-const getStatusBadge = (status: any) => {
-  switch (status) {
-    case "Confirmed":
-      return (
-        <Badge variant="outline" className="border-blue-500 text-blue-500">
-          Confirmed
-        </Badge>
-      );
-    case "In Progress":
-      return <Badge className="bg-amber-500">In Progress</Badge>;
-    case "Completed":
-      return <Badge className="bg-green-500">Completed</Badge>;
-    case "Cancelled":
-      return <Badge variant="destructive">Cancelled</Badge>;
-    default:
-      return <Badge variant="outline">Unknown</Badge>;
-  }
-};
-
-const getBadgeColor = (status: string) => {
-   switch (status) {
-    case "Confirmed":
-      return "blue";
-    case "In Progress":
-      return "amber";
-    case "Completed":
-      return "green";
-    case "Cancelled":
-      return "red";
-    default:
-      return "gray";
-  }
-}
-
 export default function CalendarPage() {
-  const [view, setView] = useState("day"); // day, week, month
+  const [view, setView] = useState("month"); // Default to month view to see more data
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDoctor, setSelectedDoctor] = useState("all");
   const [appointments, setAppointments] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchAppointments = async () => {
+    const fetchData = async () => {
       try {
-        const userStr = localStorage.getItem("user_data");
-        if (!userStr) return;
-
-        const user = JSON.parse(userStr);
-        if (user && user.id) {
-          const data = await getAppointmentsByPatientId(user.id);
-          const mappedAppointments = data.map((item: any) => {
-              const appointmentDate = new Date(item.appointmentDate);
-              const status = item.status ? item.status.charAt(0).toUpperCase() + item.status.slice(1) : "Pending";
+        setLoading(true);
+        const data = await getAppointmentsByClinic();
+        console.log("Fetched appointments:", data); // Debug logging
+        const appointmentsList = Array.isArray(data) ? data : (data.data || []);
+        
+        const transformedAppointments = appointmentsList
+          .filter((appt: any) => appt.appointmentDate) // Only show appointments with dates
+          .map((appt: any) => {
+            const date = new Date(appt.appointmentDate);
+            let color = "blue";
+            const status = appt.status?.toLowerCase() || "pending";
+            
+            if (status === "completed") color = "green";
+            else if (status === "cancelled") color = "red";
+            else if (status === "pending") color = "amber";
+            
             return {
-            id: item.id.toString(),
-            patient: {
-              name: item.patientName || "Unknown",
-              image: "/user-2.png", 
-            },
-            doctor: item.doctor?.user?.fullName || "Unknown Doctor",
-            date: appointmentDate,
-            time: item.appointmentTime,
-            endTime: calculateEndTime(item.appointmentTime, 30), // Assuming 30 mins if not provided
-            status: status,
-            type: item.appointmentType || "Consultation",
-            duration: 30, // Default duration
-            department: item.doctor?.primarySpecialization?.[0] || "General",
-            color: getBadgeColor(status),
-          }});
-          setAppointments(mappedAppointments);
+              id: String(appt.id),
+              patient: {
+                name: appt.patientName || "Unknown Patient",
+                image: "/user-2.png",
+              },
+              doctor: appt.doctorId ? `Doctor #${appt.doctorId}` : "Unassigned",
+              date: date,
+              time: appt.appointmentTime || "12:00 PM",
+              endTime: appt.appointmentTime || "12:30 PM", // Placeholder
+              status: appt.status || "Pending",
+              type: appt.appointmentType || "Appointment",
+              duration: 30,
+              department: "General",
+              color: color,
+            };
+          });
+          
+        setAppointments(transformedAppointments);
+        
+        // Auto-navigate to the latest appointment so the user sees data immediately
+        if (transformedAppointments.length > 0) {
+            const sorted = [...transformedAppointments].sort((a, b) => b.date.getTime() - a.date.getTime());
+            setCurrentDate(sorted[0].date);
         }
       } catch (error) {
         console.error("Failed to fetch appointments:", error);
+      } finally {
+        setLoading(false);
       }
     };
-
-    fetchAppointments();
+    
+    fetchData();
   }, []);
 
-  const calculateEndTime = (startTime: string, durationMinutes: number) => {
-      if(!startTime) return "";
-      // Simple parse assumes "HH:MM AM/PM" format
-      let [time, modifier] = startTime.split(' ');
-      let [hours, minutes] = time.split(':');
-      let h = parseInt(hours);
-      let m = parseInt(minutes);
-
-      if (modifier === 'PM' && h < 12) h += 12;
-      if (modifier === 'AM' && h === 12) h = 0;
-      
-      let date = new Date();
-      date.setHours(h, m + durationMinutes);
-      
-      return date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
-  }
-
-
-  // Function to get appointments for a specific date
-  const getAppointmentsForDate = (date: any) => {
-    return appointments.filter((appointment) => appointment.date.getDate() === date.getDate() && appointment.date.getMonth() === date.getMonth() && appointment.date.getFullYear() === date.getFullYear());
+  // Helper functions that now rely on the 'appointments' state
+  const getAppointmentsForDate = (date: Date) => {
+    return appointments.filter((appointment) => 
+      appointment.date.getDate() === date.getDate() && 
+      appointment.date.getMonth() === date.getMonth() && 
+      appointment.date.getFullYear() === date.getFullYear()
+    );
   };
 
-  // Function to get appointments for a specific week
-  const getAppointmentsForWeek = (date: any) => {
+  const getAppointmentsForWeek = (date: Date) => {
     const startOfWeek = new Date(date);
     startOfWeek.setDate(date.getDate() - date.getDay()); // Start from Sunday
 
     const endOfWeek = new Date(startOfWeek);
     endOfWeek.setDate(startOfWeek.getDate() + 6); // End on Saturday
+    
+    // Normalize to start of day for comparison
+    const start = new Date(startOfWeek); start.setHours(0,0,0,0);
+    const end = new Date(endOfWeek); end.setHours(23,59,59,999);
 
-    return appointments.filter((appointment) => appointment.date >= startOfWeek && appointment.date <= endOfWeek);
+    return appointments.filter((appointment) => appointment.date >= start && appointment.date <= end);
   };
 
-  // Function to get appointments for a specific month
-  const getAppointmentsForMonth = (date: any) => {
-    return appointments.filter((appointment) => appointment.date.getMonth() === date.getMonth() && appointment.date.getFullYear() === date.getFullYear());
+  const getAppointmentsForMonth = (date: Date) => {
+    return appointments.filter((appointment) => 
+      appointment.date.getMonth() === date.getMonth() && 
+      appointment.date.getFullYear() === date.getFullYear()
+    );
   };
 
   // Navigate to previous period
@@ -209,7 +171,7 @@ export default function CalendarPage() {
   };
 
   // Filter appointments by doctor if needed
-  const filteredAppointments = getCurrentAppointments().filter((appointment) => selectedDoctor === "all" || appointment.doctor.includes(selectedDoctor));
+  const filteredAppointments = getCurrentAppointments().filter((appointment) => selectedDoctor === "all" || String(appointment.doctor).includes(selectedDoctor));
 
   // Render day view
   const renderDayView = () => {
@@ -217,43 +179,47 @@ export default function CalendarPage() {
 
     return (
       <div className="space-y-4">
+        {appointmentsForDay.length === 0 ? (
+             <div className="text-center py-10 text-muted-foreground">No appointments for this day.</div>
+        ) : (
         <div className="grid grid-cols-1 gap-4">
           {timeSlots.map((timeSlot) => (
             <div key={timeSlot} className="flex border rounded-md overflow-hidden">
               <div className="md:w-20 p-1 md:p-2 bg-muted flex items-center justify-center border-r">
                 <span className="text-xs md:text-sm font-medium">{timeSlot}</span>
               </div>
-              <div className="flex-1 p-1 md:p-2 min-h-[80px]">
+              <div className="flex-1 p-1 md:p-2 min-h-[50px]">
                 {appointmentsForDay
                   .filter((appointment) => {
-                      // Basic check if timeSlot is within the appointment time range. 
-                      // This is a simplification; ideally we'd parse times properly.
-                      const slotHour = parseInt(timeSlot.split(':')[0]); // e.g., 08, 09
-                      const slotAmPm = timeSlot.split(' ')[1]; // AM/PM
-                      const appTime = appointment.time;
+                      const slotHour = parseInt(timeSlot.split(":")[0], 10);
+                      const apptHour = parseInt(appointment.time?.split(":")[0] || "0", 10);
                       
-                      return appTime.startsWith(timeSlot.split(':')[0]) && appTime.endsWith(slotAmPm);
+                      const slotPeriod = timeSlot.split(" ")[1];
+                      const apptPeriod = appointment.time?.split(" ")[1]; 
+                      
+                      if (apptPeriod && slotPeriod) {
+                          return apptHour === slotHour && apptPeriod === slotPeriod;
+                      }
+                      
+                      return apptHour === slotHour; 
                   })
                   .map((appointment) => (
                     <div key={appointment.id} className={`p-2 mb-1 rounded-md bg-${appointment.color}-500/10 border border-${appointment.color}-300`}>
                       <div className="flex items-center justify-between">
                         <div className="flex items-center">
                           <Avatar className="h-6 w-6 mr-2">
-                            <AvatarImage src={appointment.patient.image || "/user-2.png"} alt={appointment.patient.name} />
+                            <AvatarImage src={appointment.patient.image} alt={appointment.patient.name} />
                             <AvatarFallback>{appointment.patient.name.charAt(0)}</AvatarFallback>
                           </Avatar>
                           <span className="font-medium text-sm">{appointment.patient.name}</span>
                         </div>
-                        {getStatusBadge(appointment.status)}
+                        <Badge variant={appointment.status === "confirmed" ? "default" : "secondary"}>
+                           {appointment.status}
+                        </Badge>
                       </div>
-                      <div className="mt-1 text-xs text-muted-foreground max-sm:hidden">
-                        <div className="flex justify-between">
-                          <span>
-                            {appointment.time} - {appointment.endTime}
-                          </span>
-                          <span>{appointment.type}</span>
-                        </div>
-                        <div>{appointment.doctor}</div>
+                      <div className="mt-1 text-xs text-muted-foreground flex justify-between">
+                         <span>{appointment.time}</span>
+                         <span>{appointment.doctor}</span>
                       </div>
                     </div>
                   ))}
@@ -261,6 +227,7 @@ export default function CalendarPage() {
             </div>
           ))}
         </div>
+        )}
       </div>
     );
   };
@@ -288,26 +255,25 @@ export default function CalendarPage() {
 
         {/* Appointment cells */}
         {weekDays.map((day, index) => {
-          const dayAppointments = filteredAppointments.filter((appointment) => appointment.date.getDate() === day.getDate() && appointment.date.getMonth() === day.getMonth() && appointment.date.getFullYear() === day.getFullYear());
+           const dayAppointments = appointments.filter((appointment) => 
+               appointment.date.getDate() === day.getDate() && 
+               appointment.date.getMonth() === day.getMonth() && 
+               appointment.date.getFullYear() === day.getFullYear()
+           );
 
           return (
             <div key={index} className="border rounded-b-md md:p-2 min-h-[200px] max-h-[400px] overflow-y-auto">
               {dayAppointments.length === 0 ? (
                 <div className="h-full flex items-center justify-center text-xs md:text-sm text-muted-foreground">
-                  <XCircle className="h-4 w-4 md:h-6 md:w-6 mr-2 md:hidden" />
                   <span className="max-md:hidden">No appointments</span>
                 </div>
               ) : (
                 <div className="space-y-2">
                   {dayAppointments.map((appointment) => (
-                    <div key={appointment.id} className={`md:p-2 rounded-md bg-${appointment.color}-500/10 border border-${appointment.color}-300`}>
-                      <div className="flex items-center justify-between">
-                        <span className="font-medium text-xs md:text-sm">{appointment.patient.name}</span>
-                        <span className="text-xs max-md:hidden">{appointment.time}</span>
-                      </div>
-                      <div className="mt-1 text-xs text-muted-foreground max-md:hidden">
-                        <div>{appointment.type}</div>
-                        <div>{appointment.doctor}</div>
+                    <div key={appointment.id} className={`md:p-2 rounded-md bg-${appointment.color}-500/10 border border-${appointment.color}-300 p-1`}>
+                      <div className="flex flex-col gap-1">
+                        <span className="font-medium text-xs md:text-sm truncate">{appointment.patient.name}</span>
+                        <span className="text-xs text-muted-foreground">{appointment.time}</span>
                       </div>
                     </div>
                   ))}
@@ -325,8 +291,8 @@ export default function CalendarPage() {
     const year = currentDate.getFullYear();
     const month = currentDate.getMonth();
 
-    const daysInMonth = getDaysInMonth(year, month);
-    const firstDayOfMonth = getFirstDayOfMonth(year, month);
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const firstDayOfMonth = new Date(year, month, 1).getDay();
 
     // Create array of day numbers with empty spots for the first week
     const days: (number | null)[] = [...Array.from({ length: firstDayOfMonth }, () => null), ...Array.from({ length: daysInMonth }, (_, i) => i + 1)];
@@ -362,7 +328,11 @@ export default function CalendarPage() {
                 }
 
                 const date = new Date(year, month, day);
-                const dayAppointments = filteredAppointments.filter((appointment) => appointment.date.getDate() === day && appointment.date.getMonth() === month && appointment.date.getFullYear() === year);
+                const dayAppointments = appointments.filter((appointment) => 
+                    appointment.date.getDate() === day && 
+                    appointment.date.getMonth() === month && 
+                    appointment.date.getFullYear() === year
+                );
 
                 const isToday = date.getDate() === new Date().getDate() && date.getMonth() === new Date().getMonth() && date.getFullYear() === new Date().getFullYear();
 
@@ -371,7 +341,7 @@ export default function CalendarPage() {
                     <div className={`text-right text-xs md:text-sm font-medium mb-1 ${isToday ? "text-primary" : ""}`}>{day}</div>
                     <div className="space-y-1">
                       {dayAppointments.slice(0, 3).map((appointment) => (
-                        <div key={appointment.id} className={`p-1 rounded text-xs bg-${appointment.color}-500/10 dark:border border-neutral-500 truncate`}>
+                        <div key={appointment.id} className={`p-1 rounded text-xs bg-${appointment.color}-500/10 dark:border border-neutral-500 truncate`} title={`${appointment.time} - ${appointment.patient.name}`}>
                           {appointment.time} - {appointment.patient.name}
                         </div>
                       ))}
@@ -391,7 +361,7 @@ export default function CalendarPage() {
     <div className="flex flex-col gap-5">
       <div className="flex items-center gap-4 flex-wrap">
         <Button variant="outline" size="icon" asChild>
-          <Link href="/patient-dashboard/appointments">
+          <Link href="/admin-dashboard/appointments">
             <ArrowLeft className="h-4 w-4" />
             <span className="sr-only">Back</span>
           </Link>
@@ -428,26 +398,34 @@ export default function CalendarPage() {
               </TabsList>
             </Tabs>
             <div className="flex items-center gap-2 w-full sm:w-auto">
-              {/* Doctor filter could be dynamic too, but keeping it simple/mock for now as user didn't ask */}
+              {/* Doctor filter could be dynamic but leaving static for now or just 'all' */}
               <Select value={selectedDoctor} onValueChange={setSelectedDoctor}>
                 <SelectTrigger className="w-full sm:w-[200px]">
                   <SelectValue placeholder="Filter by doctor" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">All Doctors</SelectItem>
-                  {/* We could dynamically populate this list from unique doctors in appointments */}
+                  {/* We could populate this from data if we extract doctors */}
                 </SelectContent>
               </Select>
-              <Button href="/patient-dashboard/appointments/add">
-                <Plus className="h-4 w-4 mr-2" />
-                New
+              <Button asChild>
+                  <Link href="/admin-dashboard/appointments/add">
+                    <Plus className="h-4 w-4 mr-2" />
+                    New
+                  </Link>
               </Button>
             </div>
           </div>
 
-          {view === "day" && renderDayView()}
-          {view === "week" && renderWeekView()}
-          {view === "month" && renderMonthView()}
+          {loading ? (
+             <div className="py-20 text-center">Loading calendar...</div>
+          ) : (
+            <>
+              {view === "day" && renderDayView()}
+              {view === "week" && renderWeekView()}
+              {view === "month" && renderMonthView()}
+            </>
+          )}
         </CardContent>
       </Card>
     </div>
