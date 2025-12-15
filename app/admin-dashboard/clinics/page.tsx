@@ -41,7 +41,8 @@ export default function ClinicsPage() {
       try {
         setIsLoading(true);
         const fetchedClinics = await getClinics();
-        setClinics(fetchedClinics);
+        const filteredClinics = fetchedClinics.filter((clinic: any) => clinic.isDoctorClinic === false);
+        setClinics(filteredClinics);
       } catch (err) {
         setError("Failed to fetch clinics.");
         console.error(err);
