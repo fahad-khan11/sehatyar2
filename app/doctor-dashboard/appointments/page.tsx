@@ -199,7 +199,14 @@ export default function AppointmentsPage() {
     // Apply search term
     if (searchTerm) {
       const search = searchTerm.toLowerCase();
-      result = result.filter((appointment) => appointment.patient.name.toLowerCase().includes(search) || appointment.doctor.toLowerCase().includes(search) || appointment.type.toLowerCase().includes(search) || appointment.department.toLowerCase().includes(search));
+      result = result.filter((appointment) => 
+        appointment.patient.name.toLowerCase().includes(search) || 
+        appointment.patient.email.toLowerCase().includes(search) || 
+        appointment.patient.phone.includes(search) || 
+        appointment.doctor.toLowerCase().includes(search) || 
+        appointment.type.toLowerCase().includes(search) || 
+        appointment.department.toLowerCase().includes(search)
+      );
     }
 
     // Apply filters

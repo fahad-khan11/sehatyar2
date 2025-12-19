@@ -25,6 +25,13 @@ export default function ClinicsPage() {
   const [clinics, setClinics] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const filteredClinics = clinics.filter((clinic) =>
+    clinic.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    clinic.phone.includes(searchQuery) ||
+    clinic.address.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   const handleDelete = async (id: number) => {
     try {
@@ -82,6 +89,8 @@ export default function ClinicsPage() {
                   type="search"
                   placeholder="Search clinics..."
                   className="pl-8 w-[250px]"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
                 />
               </div>
             </div>
@@ -113,14 +122,14 @@ export default function ClinicsPage() {
                   </TableCell>
                 </TableRow>
               )}
-              {!isLoading && !error && clinics.length === 0 && (
+              {!isLoading && !error && filteredClinics.length === 0 && (
                 <TableRow>
                   <TableCell colSpan={5} className="text-center py-8">
-                    No clinics found.
+                    {searchQuery ? "No clinics found matching your search." : "No clinics found."}
                   </TableCell>
                 </TableRow>
               )}
-              {!isLoading && !error && clinics.map((clinic) => (
+              {!isLoading && !error && filteredClinics.map((clinic) => (
                 <TableRow key={clinic.id}>
                   <TableCell className="font-medium">{clinic.name}</TableCell>
                   <TableCell>{clinic.phone}</TableCell>

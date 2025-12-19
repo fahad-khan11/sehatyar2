@@ -38,6 +38,14 @@ export default function AppointmentsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const filteredAppointments = appointments.filter((appointment) =>
+    (appointment.patientName || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
+    (appointment.phoneNumber || "").includes(searchQuery) ||
+    (appointment.email || "").toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   // Added delete handler
   const handleDelete = async (id: number) => {
     try {
@@ -109,6 +117,8 @@ export default function AppointmentsPage() {
               type="search"
               placeholder="Search appointments..."
               className="pl-8 w-full md:w-[250px]"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
         </CardHeader>
@@ -136,34 +146,42 @@ export default function AppointmentsPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {appointments.map((appointment) => (
-                  <TableRow key={appointment.id}>
-                    <TableCell className="font-medium">{appointment.patientName || "N/A"}</TableCell>
-                    <TableCell>{appointment.phoneNumber}</TableCell>
-                    <TableCell>{appointment.email || "N/A"}</TableCell>
-                    <TableCell className="capitalize">{appointment.paymentMethod}</TableCell>
-                    <TableCell>{appointment.amount ? `$${appointment.amount}` : "N/A"}</TableCell>
-                    <TableCell className="max-w-[200px] truncate" title={appointment.notes}>
-                      {appointment.notes || "N/A"}
-                    </TableCell>
-                    <TableCell>
-                      {appointment.appointmentDate
-                        ? new Date(appointment.appointmentDate).toLocaleDateString()
-                        : "N/A"}
-                    </TableCell>
-                    <TableCell>{appointment.appointmentTime}</TableCell>
-                    <TableCell>
-                      <Badge className={getStatusBadge(appointment.status) as string}>
-                        {appointment.status}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <Button variant="ghost" size="icon" onClick={() => handleDelete(appointment.id)}>
-                        <Trash className="h-4 w-4 text-red-500" />
-                      </Button>
+                {filteredAppointments.length === 0 ? (
+                  <TableRow>
+                     <TableCell colSpan={10} className="text-center py-8 text-muted-foreground">
+                      No appointments found matching your search.
                     </TableCell>
                   </TableRow>
-                ))}
+                ) : (
+                  filteredAppointments.map((appointment) => (
+                    <TableRow key={appointment.id}>
+                      <TableCell className="font-medium">{appointment.patientName || "N/A"}</TableCell>
+                      <TableCell>{appointment.phoneNumber}</TableCell>
+                      <TableCell>{appointment.email || "N/A"}</TableCell>
+                      <TableCell className="capitalize">{appointment.paymentMethod}</TableCell>
+                      <TableCell>{appointment.amount ? `$${appointment.amount}` : "N/A"}</TableCell>
+                      <TableCell className="max-w-[200px] truncate" title={appointment.notes}>
+                        {appointment.notes || "N/A"}
+                      </TableCell>
+                      <TableCell>
+                        {appointment.appointmentDate
+                          ? new Date(appointment.appointmentDate).toLocaleDateString()
+                          : "N/A"}
+                      </TableCell>
+                      <TableCell>{appointment.appointmentTime}</TableCell>
+                      <TableCell>
+                        <Badge className={getStatusBadge(appointment.status) as string}>
+                          {appointment.status}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <Button variant="ghost" size="icon" onClick={() => handleDelete(appointment.id)}>
+                          <Trash className="h-4 w-4 text-red-500" />
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
               </TableBody>
             </Table>
           )}

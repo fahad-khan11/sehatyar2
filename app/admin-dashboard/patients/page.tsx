@@ -34,6 +34,14 @@ export default function ReceptionistsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const filteredPatients = patients.filter((patient) =>
+    patient.fullName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    patient.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    patient.phoneNumber.includes(searchQuery)
+  );
+
   // Added delete handler
   const handleDelete = async (id: number) => {
     try {
@@ -93,6 +101,8 @@ export default function ReceptionistsPage() {
                   type="search"
                   placeholder="Search patients..."
                   className="pl-8 w-[250px]"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
                 />
               </div>
             </div>
@@ -117,47 +127,55 @@ export default function ReceptionistsPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {patients.map((patient) => (
-                  <TableRow key={patient.id}>
-                    <TableCell>
-                      <div className="flex items-center gap-3">
-                        <Avatar className="h-9 w-9">
-                          <AvatarFallback>
-                            {patient.fullName ? patient.fullName.charAt(0).toUpperCase() : "?"}
-                          </AvatarFallback>
-                        </Avatar>
-                        <div className="font-medium">{patient.fullName}</div>
-                      </div>
-                    </TableCell>
-                    <TableCell>{patient.gender}</TableCell>
-                    <TableCell>
-                      <div className="flex flex-col gap-1 text-sm">
-                        <div className="flex items-center gap-2 text-muted-foreground">
-                          <Mail className="h-3 w-3" />
-                          <span>{patient.email}</span>
-                        </div>
-                        <div className="flex items-center gap-2 text-muted-foreground">
-                          <Phone className="h-3 w-3" />
-                          <span>{patient.phoneNumber}</span>
-                        </div>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <Badge
-                        variant={
-                          patient.isActive ? "default" : "secondary"
-                        }
-                      >
-                        {patient.isActive ? "Active" : "Inactive"}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <Button variant="ghost" size="icon" onClick={() => handleDelete(patient.id)}>
-                        <Trash className="h-4 w-4 text-red-500" />
-                      </Button>
+                {filteredPatients.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
+                      No patients found matching your search.
                     </TableCell>
                   </TableRow>
-                ))}
+                ) : (
+                  filteredPatients.map((patient) => (
+                    <TableRow key={patient.id}>
+                      <TableCell>
+                        <div className="flex items-center gap-3">
+                          <Avatar className="h-9 w-9">
+                            <AvatarFallback>
+                              {patient.fullName ? patient.fullName.charAt(0).toUpperCase() : "?"}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div className="font-medium">{patient.fullName}</div>
+                        </div>
+                      </TableCell>
+                      <TableCell>{patient.gender}</TableCell>
+                      <TableCell>
+                        <div className="flex flex-col gap-1 text-sm">
+                          <div className="flex items-center gap-2 text-muted-foreground">
+                            <Mail className="h-3 w-3" />
+                            <span>{patient.email}</span>
+                          </div>
+                          <div className="flex items-center gap-2 text-muted-foreground">
+                            <Phone className="h-3 w-3" />
+                            <span>{patient.phoneNumber}</span>
+                          </div>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <Badge
+                          variant={
+                            patient.isActive ? "default" : "secondary"
+                          }
+                        >
+                          {patient.isActive ? "Active" : "Inactive"}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <Button variant="ghost" size="icon" onClick={() => handleDelete(patient.id)}>
+                          <Trash className="h-4 w-4 text-red-500" />
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
               </TableBody>
             </Table>
           )}

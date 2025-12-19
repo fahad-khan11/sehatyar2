@@ -34,6 +34,14 @@ export default function ReceptionistsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const filteredReceptionists = receptionists.filter((receptionist) =>
+    receptionist.fullName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    receptionist.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    receptionist.phoneNumber.includes(searchQuery)
+  );
+
   // Added delete handler
   const handleDelete = async (id: number) => {
     try {
@@ -93,6 +101,8 @@ export default function ReceptionistsPage() {
                   type="search"
                   placeholder="Search receptionists..."
                   className="pl-8 w-[250px]"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
                 />
               </div>
             </div>
@@ -117,47 +127,55 @@ export default function ReceptionistsPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {receptionists.map((receptionist) => (
-                  <TableRow key={receptionist.id}>
-                    <TableCell>
-                      <div className="flex items-center gap-3">
-                        <Avatar className="h-9 w-9">
-                          <AvatarFallback>
-                            {receptionist.fullName ? receptionist.fullName.charAt(0).toUpperCase() : "?"}
-                          </AvatarFallback>
-                        </Avatar>
-                        <div className="font-medium">{receptionist.fullName}</div>
-                      </div>
-                    </TableCell>
-                    <TableCell>{receptionist.gender}</TableCell>
-                    <TableCell>
-                      <div className="flex flex-col gap-1 text-sm">
-                        <div className="flex items-center gap-2 text-muted-foreground">
-                          <Mail className="h-3 w-3" />
-                          <span>{receptionist.email}</span>
-                        </div>
-                        <div className="flex items-center gap-2 text-muted-foreground">
-                          <Phone className="h-3 w-3" />
-                          <span>{receptionist.phoneNumber}</span>
-                        </div>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <Badge
-                        variant={
-                          receptionist.isActive ? "default" : "secondary"
-                        }
-                      >
-                        {receptionist.isActive ? "Active" : "Inactive"}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <Button variant="ghost" size="icon" onClick={() => handleDelete(receptionist.id)}>
-                        <Trash className="h-4 w-4 text-red-500" />
-                      </Button>
+                {filteredReceptionists.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
+                      No receptionists found matching your search.
                     </TableCell>
                   </TableRow>
-                ))}
+                ) : (
+                  filteredReceptionists.map((receptionist) => (
+                    <TableRow key={receptionist.id}>
+                      <TableCell>
+                        <div className="flex items-center gap-3">
+                          <Avatar className="h-9 w-9">
+                            <AvatarFallback>
+                              {receptionist.fullName ? receptionist.fullName.charAt(0).toUpperCase() : "?"}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div className="font-medium">{receptionist.fullName}</div>
+                        </div>
+                      </TableCell>
+                      <TableCell>{receptionist.gender}</TableCell>
+                      <TableCell>
+                        <div className="flex flex-col gap-1 text-sm">
+                          <div className="flex items-center gap-2 text-muted-foreground">
+                            <Mail className="h-3 w-3" />
+                            <span>{receptionist.email}</span>
+                          </div>
+                          <div className="flex items-center gap-2 text-muted-foreground">
+                            <Phone className="h-3 w-3" />
+                            <span>{receptionist.phoneNumber}</span>
+                          </div>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <Badge
+                          variant={
+                            receptionist.isActive ? "default" : "secondary"
+                          }
+                        >
+                          {receptionist.isActive ? "Active" : "Inactive"}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <Button variant="ghost" size="icon" onClick={() => handleDelete(receptionist.id)}>
+                          <Trash className="h-4 w-4 text-red-500" />
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
               </TableBody>
             </Table>
           )}
