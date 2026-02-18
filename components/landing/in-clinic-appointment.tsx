@@ -1,6 +1,6 @@
 "use client";
 
-import { Search, MapPin, Loader2 } from "lucide-react";
+import { Search, MapPin } from "lucide-react";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { useState, useMemo, useCallback } from "react";
@@ -44,7 +44,7 @@ export default function InClinicAppointment() {
   const { 
     city: location, 
     setCity: setLocation, 
-    isLoadingLocation, 
+    // isLoadingLocation, // auto-detect disabled
     citySuggestions, 
     getCitySuggestions, 
     clearCitySuggestions 
@@ -104,13 +104,10 @@ export default function InClinicAppointment() {
       {/* Location Search Row */}
       <div className="flex gap-2 sm:gap-3 w-full">
         <div className="relative flex-1">
-          {isLoadingLocation ? (
-            <Loader2 className="absolute left-3 sm:left-5 top-1/2 -translate-y-1/2 text-gray-500 w-5 h-5 sm:w-6 sm:h-6 z-10 animate-spin" />
-          ) : (
+          {/* isLoadingLocation spinner disabled */}
             <MapPin className="absolute left-3 sm:left-5 top-1/2 -translate-y-1/2 text-gray-500 w-5 h-5 sm:w-6 sm:h-6 z-10" />
-          )}
           <Input 
-            placeholder={isLoadingLocation ? "Detecting location..." : "Enter city name"}
+            placeholder="Enter city name"
             value={location}
             onChange={(e) => handleLocationInputChange(e.target.value)}
             onFocus={() => setIsLocationFocused(true)}
@@ -124,7 +121,7 @@ export default function InClinicAppointment() {
                 setIsLocationFocused(false);
               }
             }}
-            className="pl-10 sm:pl-14 bg-[#F4F4F4] border border-[#F4F4F4] rounded-full h-[50px] sm:h-[60px] text-base sm:text-lg text-[#333333] shadow-none focus-visible:ring-0 placeholder:text-gray-500"
+            className="pl-10 sm:pl-14 bg-[#F4F4F4] border-0 rounded-full h-[50px] sm:h-[60px] text-base sm:text-lg text-[#333333] shadow-none focus-visible:ring-2 focus-visible:ring-[#4e148c] focus-visible:ring-offset-0 placeholder:text-gray-500"
           />
         </div>
         <Button 
@@ -154,7 +151,7 @@ export default function InClinicAppointment() {
               setIsSearchFocused(false);
             }
           }}
-          className="pl-10 sm:pl-14 bg-[#F4F4F4] border border-[#F4F4F4] rounded-full h-[50px] sm:h-[60px] text-base sm:text-lg text-[#333333] shadow-none focus-visible:ring-0 placeholder:text-gray-500 placeholder:text-sm sm:placeholder:text-base"
+          className="pl-10 sm:pl-14 bg-[#F4F4F4] border-0 rounded-full h-[50px] sm:h-[60px] text-base sm:text-lg text-[#333333] shadow-none focus-visible:ring-2 focus-visible:ring-[#4e148c] focus-visible:ring-offset-0 placeholder:text-gray-500 placeholder:text-sm sm:placeholder:text-base"
         />
       </div>
 

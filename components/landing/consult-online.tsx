@@ -1,5 +1,4 @@
 import React, { useState } from 'react'
-import { Input } from '../ui/input'
 import Image from 'next/image'
 import { cn } from '@/lib/utils'
 import Link from 'next/link';
@@ -34,20 +33,20 @@ const DoctorCard = ({ name, isOnline, icon }: {
               
             },
           }}>
-    <div className="group flex items-center py-3 px-3 sm:py-4 sm:px-6.5 transition-all rounded-2xl sm:rounded-4xl border-[1px] border-[#A6A6A6] gap-2 sm:gap-2.5 hover:bg-[#F4F4F4] hover:border-none">
-      <div className='bg-[var(--brand-primary)] group-hover:bg-[var(--brand-primary-hover)] p-2 sm:p-3 rounded-full flex-shrink-0 transition-colors duration-200'>
-        <Image src={icon} alt={name} width={20} height={20} className='w-4 h-4 sm:w-5 sm:h-5'/>
+    <div className="group flex items-center py-4 px-5 sm:py-3 sm:px-4 transition-all rounded-[2rem] border-[1px] border-gray-300 gap-4 hover:bg-[#F9F9F9]">
+      <div className='bg-[#4e148c] group-hover:bg-[#ff6701] p-3 sm:p-4 rounded-full flex-shrink-0 transition-colors duration-200'>
+        <Image src={icon} alt={name} width={20} height={20} className='w-6 h-6 sm:w-5 sm:h-5 invert brightness-0 contrast-200'/>
       </div>
-      <div className='flex flex-col gap-0.5 sm:gap-1 min-w-0'>
-      <h3 className="text-xs sm:text-sm md:text-base font-medium text-gray-900 mb-0 truncate">{name}</h3>
-      <button className='text-start'>
+      <div className='flex flex-col gap-1.5'>
+        <h3 className="text-sm sm:text-base font-semibold text-gray-900">{name}</h3>
         <span className={cn(
-        "px-2 sm:px-3 py-0.5 text-[10px] sm:text-xs font-medium rounded-full transition-colors duration-200",
-        isOnline ? "bg-[#ede0f7] group-hover:bg-[var(--brand-primary-hover)] text-[var(--brand-primary)] group-hover:text-white" : "bg-gray-100 text-gray-800"
-      )}>
-        {isOnline ? 'Online' : 'Offline'}
-      </span>
-        </button>
+          "px-3 py-0.5 text-xs font-medium rounded-full w-fit transition-colors duration-200",
+          isOnline
+            ? "bg-[#ede0f7] text-[#4e148c] group-hover:bg-[#ff6701] group-hover:text-white"
+            : "bg-gray-100 text-gray-800"
+        )}>
+          {isOnline ? 'Online' : 'Offline'}
+        </span>
       </div>
     </div>
     </Link>
@@ -68,15 +67,15 @@ export default function ConsultOnline() {
       <h2 className="text-lg sm:text-xl md:text-2xl font-bold mb-4 sm:mb-6 text-center block sm:hidden">Consult Online</h2>
       
       {/* Search Input */}
-      <div className="flex items-center text-sm sm:text-base bg-[#F4F4F4] text-[#616161] rounded-full px-3 sm:px-5 py-2.5 sm:py-4 mb-4 sm:mb-6 mx-auto">
+      <div className="flex items-center gap-2 bg-[#F4F4F4] text-[#616161] rounded-full px-4 sm:px-5 py-3 sm:py-4 mb-4 sm:mb-6">
         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-[#616161] w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0">
           <circle cx="11" cy="11" r="8"></circle>
           <path d="m21 21-4.3-4.3"></path>
         </svg>
-        <Input
+        <input
           type="text"
           placeholder="Search for specialization"
-          className="hero-input border-none shadow-none bg-transparent focus:ring-0 h-full w-full placeholder:text-[#616161] placeholder:text-xs sm:placeholder:text-sm placeholder:font-light"
+          className="bg-transparent outline-none border-none w-full text-sm sm:text-base text-gray-800 placeholder:text-[#616161] placeholder:font-light"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
         />
