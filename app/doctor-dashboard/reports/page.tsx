@@ -99,63 +99,9 @@ export default function ReportsPage() {
           </CardContent>
         </Card>
 
-        <Card className="flex flex-col">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <PackageIcon className="h-5 w-5" />
-              Inventory Reports
-            </CardTitle>
-            <CardDescription>Track inventory levels, usage, and supply chain metrics</CardDescription>
-          </CardHeader>
-          <CardContent className="flex flex-1 flex-col justify-between gap-6">
-            <div className="space-y-2">
-              <div className="flex items-center justify-between text-sm">
-                <span className="text-muted-foreground">Total Items</span>
-                <span className="font-medium">1,245</span>
-              </div>
-              <div className="flex items-center justify-between text-sm">
-                <span className="text-muted-foreground">Low Stock</span>
-                <span className="font-medium">32</span>
-              </div>
-              <div className="flex items-center justify-between text-sm">
-                <span className="text-muted-foreground">Inventory Value</span>
-                <span className="font-medium">$248,320</span>
-              </div>
-            </div>
-            <Button asChild>
-              <Link href="/reports/inventory">View Report</Link>
-            </Button>
-          </CardContent>
-        </Card>
+    
 
-        <Card className="flex flex-col">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <ChartBarIcon className="h-5 w-5" />
-              Staff Performance
-            </CardTitle>
-            <CardDescription>Evaluate staff productivity, attendance, and performance</CardDescription>
-          </CardHeader>
-          <CardContent className="flex flex-1 flex-col justify-between gap-6">
-            <div className="space-y-2">
-              <div className="flex items-center justify-between text-sm">
-                <span className="text-muted-foreground">Staff Count</span>
-                <span className="font-medium">48</span>
-              </div>
-              <div className="flex items-center justify-between text-sm">
-                <span className="text-muted-foreground">Avg. Attendance</span>
-                <span className="font-medium">92.5%</span>
-              </div>
-              <div className="flex items-center justify-between text-sm">
-                <span className="text-muted-foreground">Productivity</span>
-                <span className="font-medium">87.3%</span>
-              </div>
-            </div>
-            <Button asChild variant="outline">
-              <Link href="#">Coming Soon</Link>
-            </Button>
-          </CardContent>
-        </Card>
+     
 
         <Card className="flex flex-col">
           <CardHeader>

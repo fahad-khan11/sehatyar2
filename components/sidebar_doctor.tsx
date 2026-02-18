@@ -8,7 +8,7 @@ import { UserRole } from "@/lib/types";
 import logoLight from "@/public/Group_3016.svg";
 import logoDark from "@/public/Group_3015.svg";
 
-import { BarChart3, Calendar, Calendar1, LayoutDashboard, MessageCircle, Settings, Star, UserRound, X } from "lucide-react";
+import { BarChart3, Calendar, Calendar1, ClipboardList, LayoutDashboard, MessageCircle, Settings, Star, Timer, UserRound, X } from "lucide-react";
 import { useTheme } from "next-themes";
 import Image from "next/image";
 import Link from "next/link";
@@ -68,7 +68,15 @@ export function Doctor_Sidebar({ isOpen, setIsOpen }: SidebarProps) {
         { title: "Calendar View", href: "/doctor-dashboard/appointments/calendar" },
       ],
     });
-
+ items.push({
+      title: "Availability",
+      href: "/doctor-dashboard/settings/hours",
+      icon: Timer,
+      submenu: [
+        { title: "In-Clinic", href: "/doctor-dashboard/settings/hours" },
+        { title: "Online Consultation", href: "/doctor-dashboard/settings/online-hours" },
+      ],
+    });
     // Patients - for all doctor roles
     items.push({
       title: "Patients",
@@ -101,37 +109,29 @@ export function Doctor_Sidebar({ isOpen, setIsOpen }: SidebarProps) {
     });
 
     // Settings - for all doctor roles
-    items.push({
-      title: "Settings",
-      href: "/doctor-dashboard/settings",
-      icon: Settings,
-      submenu: [
-        { title: "General Settings", href: "/doctor-dashboard/settings" },
-        { title: "Notifications", href: "/doctor-dashboard/settings/notifications" },
-        { title: "Working Hours", href: "/doctor-dashboard/settings/hours" },
-        { title: "Integrations", href: "/doctor-dashboard/settings/integrations" },
-      ],
-    });
+  
 
-    // Calendar - for all doctor roles
-    items.push({
-      title: "Calendar",
-      href: "/doctor-dashboard/calendar",
-      icon: Calendar1,
-    });
 
-    // Contacts - for all doctor roles
-    items.push({
-      title: "Contacts",
-      href: "/doctor-dashboard/contact",
-      icon: UserRound,
-    });
+
 
     // Chat - for all doctor roles
     items.push({
       title: "Chat",
       href: "/doctor-dashboard/chat",
       icon: MessageCircle,
+    });
+
+    // Tasks - for all doctor roles
+    items.push({
+      title: "Tasks",
+      href: "/doctor-dashboard/tasks",
+      icon: ClipboardList,
+    });
+      items.push({
+      title: "Settings",
+      href: "/doctor-dashboard/settings",
+      icon: Settings,
+     
     });
 
     return items;
@@ -165,9 +165,9 @@ export function Doctor_Sidebar({ isOpen, setIsOpen }: SidebarProps) {
   return (
     <aside className={sidebarClasses}>
       <div className="flex py-3 xl:py-3.5 items-center justify-between px-4">
-        <Link href="/" className="flex items-center space-x-2"> 
-          <Image src={theme=="dark"?logoDark:logoLight} alt="Medixpro" width={175} height={50} />
-          
+        <Link href="/" className="flex items-center space-x-2">
+          <Image src={theme == "dark" ? logoDark : logoLight} alt="Medixpro" width={175} height={50} />
+
         </Link>
         <Button variant="ghost" size="icon" className="xl:hidden" onClick={() => setIsOpen(false)}>
           <X className="size-6" />

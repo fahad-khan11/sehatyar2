@@ -1,6 +1,6 @@
 import axios from "axios"
 
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL||"https://sehatyarr-c23468ec8014.herokuapp.com/"
 
 const accessToken = localStorage.getItem("access_token");
 

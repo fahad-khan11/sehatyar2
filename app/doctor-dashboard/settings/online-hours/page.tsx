@@ -34,7 +34,7 @@ const INITIAL_HOURS: DayConfig[] = [
   { day: "Sunday", isOpen: false, slots: [{ id: "7", start: "09:00", end: "15:00", location: "main" }] },
 ];
 
-export default function WorkingHoursPage() {
+export default function OnlineConsultationPage() {
   const [workingHours, setWorkingHours] = useState<DayConfig[]>(INITIAL_HOURS);
   const [isSaving, setIsSaving] = useState(false);
 
@@ -43,7 +43,7 @@ export default function WorkingHoursPage() {
     // Simulate API call
     setTimeout(() => {
       setIsSaving(false);
-      toast.success("Working hours updated successfully");
+      toast.success("Availability updated successfully");
     }, 1000);
   };
 
@@ -96,7 +96,7 @@ export default function WorkingHoursPage() {
       <div className="flex items-center justify-between gap-4 flex-wrap">
         <div className="flex items-center space-x-2">
 
-          <h1 className="text-2xl font-bold tracking-tight">Working Hours</h1>
+          <h1 className="text-2xl font-bold tracking-tight">Online Consultation Availability</h1>
         </div>
         <div className="flex items-center space-x-2">
           <Button variant="outline">Cancel</Button>
@@ -114,8 +114,8 @@ export default function WorkingHoursPage() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 flex-wrap gap-4">
             <div className="space-y-1">
-              <CardTitle>Clinic Hours</CardTitle>
-              <CardDescription>Set your clinic's regular operating hours for each day of the week. You can add multiple slots per day.</CardDescription>
+              <CardTitle>Online Session Hours</CardTitle>
+              <CardDescription>Set your availability for telemedicine and online consultation sessions. You can add multiple slots per day.</CardDescription>
             </div>
             <div className="flex items-center space-x-2 bg-muted/50 px-4 py-2 rounded-lg border">
               <Label htmlFor="all-days-toggle" className="text-sm font-medium cursor-pointer">All Days Open</Label>
@@ -186,21 +186,7 @@ export default function WorkingHoursPage() {
                               </Select>
                             </div>
 
-                            <div className="w-48">
-                              <Select
-                                value={slot.location}
-                                onValueChange={(v) => updateSlot(dayIndex, slot.id, "location", v)}
-                              >
-                                <SelectTrigger>
-                                  <SelectValue placeholder="Location" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  <SelectItem value="main">Main Clinic</SelectItem>
-                                  <SelectItem value="city">City Hospital</SelectItem>
-                                  <SelectItem value="online">Online / Video</SelectItem>
-                                </SelectContent>
-                              </Select>
-                            </div>
+
 
                             <div className="w-10 flex justify-end">
                               {dayConfig.slots.length > 1 && (
