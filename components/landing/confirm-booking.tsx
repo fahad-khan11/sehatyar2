@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState, useEffect } from "react";
-import { useAuth } from "@/src/contexts/AuthContext";
+import { useAuth } from "@/context/AuthContext";
 import { getDoctorProfileByDoctorId } from "@/lib/Api/Doctor/doctor_api";
 import { Button } from "../ui/button";
 import { Card, CardContent } from "../ui/card";
@@ -55,22 +55,20 @@ export default function ConfirmBooking() {
                 <button
                   type="button"
                   onClick={() => setSelf(true)}
-                  className={`px-3 py-1.5 rounded-[12px] text-[14px] font-[600px]  ${
-                    self
+                  className={`px-3 py-1.5 rounded-[12px] text-[14px] font-[600px]  ${self
                       ? "bg-[#4e148c] text-white "
                       : "bg-white text-[#6B7280] "
-                  }`}
+                    }`}
                 >
                   My Self
                 </button>
                 <button
                   type="button"
                   onClick={() => setSelf(false)}
-                  className={`px-3 py-1.5 rounded-[12px] text-[14px] font-[600px]  ${
-                    !self
+                  className={`px-3 py-1.5 rounded-[12px] text-[14px] font-[600px]  ${!self
                       ? "bg-[#4e148c] text-white "
                       : "bg-white text-[#414141] "
-                  }`}
+                    }`}
                 >
                   + Someone else
                 </button>
@@ -95,24 +93,24 @@ export default function ConfirmBooking() {
                     value={phoneNumber}
                     onChange={e => setPhoneNumber(e.target.value)}
                   />
-                <div className="space-y-2">
-                  <Label className="text-[14px] font-semibold text-[#414141]">Email (Optional)</Label>
-                  <Input
-                    placeholder="Enter Email"
-                    className="h-11 rounded-[12px] border-[#E5E7EB] text-[14px] placeholder:text-[#9CA3AF]"
-                    value={email}
-                    onChange={e => setEmail(e.target.value)}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label className="text-[14px] font-semibold text-[#414141]">Notes </Label>
-                  <Input
-                    placeholder="Write Your Issue here in few words"
-                    className="h-11 rounded-[12px] border-[#E5E7EB] text-[14px] placeholder:text-[#9CA3AF]"
-                    value={notes}
-                    onChange={e => setNotes(e.target.value)}
-                  />
-                </div>
+                  <div className="space-y-2">
+                    <Label className="text-[14px] font-semibold text-[#414141]">Email (Optional)</Label>
+                    <Input
+                      placeholder="Enter Email"
+                      className="h-11 rounded-[12px] border-[#E5E7EB] text-[14px] placeholder:text-[#9CA3AF]"
+                      value={email}
+                      onChange={e => setEmail(e.target.value)}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-[14px] font-semibold text-[#414141]">Notes </Label>
+                    <Input
+                      placeholder="Write Your Issue here in few words"
+                      className="h-11 rounded-[12px] border-[#E5E7EB] text-[14px] placeholder:text-[#9CA3AF]"
+                      value={notes}
+                      onChange={e => setNotes(e.target.value)}
+                    />
+                  </div>
                 </div>
 
                 <div className="space-y-2">
@@ -120,19 +118,17 @@ export default function ConfirmBooking() {
                   <button
                     type="button"
                     onClick={() => setPayment("online")}
-                    className={`flex items-center justify-between w-full h-12 rounded-[12px] border mt-6 px-4 text-[14px] ${
-                      payment === "online"
+                    className={`flex items-center justify-between w-full h-12 rounded-[12px] border mt-6 px-4 text-[14px] ${payment === "online"
                         ? "bg-white border-[#4e148c]"
                         : "bg-white border-[#4e148c]"
-                    }`}
+                      }`}
                   >
                     <div className="flex items-center gap-2">
                       <span
-                        className={`inline-flex h-4 w-4 items-center justify-center rounded-full border ${
-                          payment === "online"
+                        className={`inline-flex h-4 w-4 items-center justify-center rounded-full border ${payment === "online"
                             ? "bg-white border-[#4e148c]"
                             : "bg-white border-[#D1D5DB]"
-                        }`}
+                          }`}
                       >
                         {payment === "online" && (
                           <span className="h-2.5 w-2.5 rounded-full bg-[#4e148c]" />
@@ -190,9 +186,9 @@ export default function ConfirmBooking() {
                 </div>
               ) : null}
 
-             
 
-        <div className="mt-5">
+
+              <div className="mt-5">
                 <Button
                   className="w-full h-10 rounded-full text-[14px] font-medium bg-[#4e148c] hover:bg-[#ff6600] text-white transition-colors duration-200"
                   disabled={!patientName || !phoneNumber || !notes}

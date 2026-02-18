@@ -7,6 +7,7 @@ import { useRouter, usePathname } from "next/navigation";
 interface User {
   id: number;
   email: string;
+  fullName?: string;
   role: UserRole;
   access_token?: string;
 }
@@ -50,16 +51,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (userData.role === UserRole.ADMIN) {
       router.push("/admin-dashboard"); // Assuming clinics is the default view for admin
     } else if (userData.role === UserRole.DOCTOR || userData.role === UserRole.CLINICDOCTOR || userData.role === UserRole.INDIVIDUALDOCTOR) {
-        // Assuming doctor dashboard exists, otherwise redirect to home/safe page
-         router.push("/doctor-dashboard");
+      // Assuming doctor dashboard exists, otherwise redirect to home/safe page
+      router.push("/doctor-dashboard");
     } else if (userData.role === UserRole.RECEPTIONIST || userData.role === UserRole.CLINICRECEPTIONIST) {
-         router.push("/receptionist-dashboard");
+      router.push("/receptionist-dashboard");
     } else if (userData.role === UserRole.PATIENT) {
-         router.push("/patient-dashboard");
+      router.push("/patient-dashboard");
     } else if (userData.role === UserRole.CLINIC) {
-         router.push("/clinic-dashboard");
+      router.push("/clinic-dashboard");
     }
-     else {
+    else {
       router.push("/");
     }
   };
@@ -71,14 +72,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     localStorage.removeItem("user_data");
     router.push("/");
   };
-  
-    // Role based route protection logic could be here or in layout. 
-    // Implementing basic protection here to ensure redirection if unauthorized.
+
+  // Role based route protection logic could be here or in layout. 
+  // Implementing basic protection here to ensure redirection if unauthorized.
   // useEffect(() => {
   //   if (isLoading) return;
 
   //   const isPublicRoute = pathname === "/" || pathname === "/auth/register" || pathname === "/auth/forgot-password";
-    
+
   //   // If not logged in and trying to access protected route (assuming all non-public are protected)
   //   if (!token && !isPublicRoute) {
   //       // e.g. /admin-dashboard should redirect to /
@@ -86,7 +87,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   //       // User specifically asked for layout allowed roles, so we will handle strict checks there.
   //       // But basic check:
   //   }
-    
+
   //   // If logged in, prevent access to login page
   //   if (token && isPublicRoute) {
   //        if (user?.role === UserRole.ADMIN) {
