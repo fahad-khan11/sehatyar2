@@ -3,8 +3,9 @@ import { Card } from "../ui/card";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import Image from "next/image";
-import { ArrowRight, Search, MapPin, Loader2 } from "lucide-react";
+import { ArrowRight, Search, MapPin } from "lucide-react";
 import { useEffect, useState, useRef, useMemo, useCallback } from "react";
+import { createPortal } from "react-dom";
 import { useRouter } from "next/navigation";
 import { Dialog, DialogContent } from "../ui/dialog";
 import ConsultOnline from "./consult-online";
@@ -46,7 +47,6 @@ export default function HeroSection() {
   const { 
     city, 
     setCity, 
-    isLoadingLocation, 
     citySuggestions, 
     getCitySuggestions, 
     clearCitySuggestions 
@@ -57,6 +57,27 @@ export default function HeroSection() {
   const [focusedIndex, setFocusedIndex] = useState(-1);
   const [isFocused, setIsFocused] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const searchInputRef = useRef<HTMLDivElement>(null);
+  const [dropdownPos, setDropdownPos] = useState<{ top: number; left: number; width: number } | null>(null);
+
+  const updateDropdownPos = useCallback(() => {
+    if (searchInputRef.current) {
+      const rect = searchInputRef.current.getBoundingClientRect();
+      setDropdownPos({ top: rect.bottom + 8, left: rect.left, width: rect.width });
+    }
+  }, []);
+
+  useEffect(() => {
+    if (isFocused) {
+      updateDropdownPos();
+      window.addEventListener('scroll', updateDropdownPos, true);
+      window.addEventListener('resize', updateDropdownPos);
+      return () => {
+        window.removeEventListener('scroll', updateDropdownPos, true);
+        window.removeEventListener('resize', updateDropdownPos);
+      };
+    }
+  }, [isFocused, updateDropdownPos]);
   
   // City autocomplete UI state (local, not shared)
   const [isCityFocused, setIsCityFocused] = useState(false);
@@ -187,11 +208,7 @@ export default function HeroSection() {
               {/* Mobile Location Dropdown */}
               <div className="md:hidden w-full max-w-md mb-2 relative">
                 <div className="flex items-center gap-2 text-gray-700">
-                  {isLoadingLocation ? (
-                    <Loader2 className="w-4 h-4 text-gray-400 animate-spin" />
-                  ) : (
-                    <MapPin className="w-4 h-4 text-gray-500" />
-                  )}
+                  <MapPin className="w-4 h-4 text-gray-500" />
                   <div className="flex-1 relative">
                     <input
                       type="text"
@@ -199,7 +216,7 @@ export default function HeroSection() {
                       onChange={(e) => handleCityInputChange(e.target.value)}
                       onFocus={() => setIsCityFocused(true)}
                       onKeyDown={handleCityKeyDown}
-                      placeholder={isLoadingLocation ? "Detecting location..." : "Select City"}
+                      placeholder="Select City"
                       className="bg-transparent border-none outline-none text-gray-700 text-base font-medium cursor-pointer p-0 h-auto focus-visible:outline-none w-full"
                     />
                     {isCityFocused && citySuggestions.length > 0 && (
@@ -253,51 +270,53 @@ export default function HeroSection() {
 
               {/* Desktop Search Bar */}
               <div
-                className="hidden md:flex bg-white p-2 shadow-lg max-w-[1000px] border rounded-full border-gray-100 flex-row gap-2 mt-4"
+                className="hidden md:flex bg-white p-2 shadow-lg max-w-[1000px] border rounded-full border-gray-100 flex-row gap-2 mt-4 overflow-visible"
                 ref={dropdownRef}
               >
-                <div className="flex-1 relative bg-[#F4F4F4] rounded-full px-6 py-2 flex items-center gap-3">
+                <div className="flex-1 relative bg-[#F4F4F4] rounded-full px-6 py-2 flex items-center gap-3 overflow-visible" ref={searchInputRef}>
                   <Search className="w-5 h-5 text-gray-400" />
-                  <div className="flex-1 relative">
+                  <div className="flex-1">
                     <input
                       type="text"
                       placeholder="Specialist or Hospital"
                       value={query}
                       onChange={(e) => setQuery(e.target.value)}
-                      onFocus={() => setIsFocused(true)}
+                      onFocus={() => {
+                        setIsFocused(true);
+                        updateDropdownPos();
+                      }}
                       onKeyDown={handleKeyDown}
                       className="border-none bg-transparent p-0 h-auto focus-visible:outline-none placeholder:text-gray-400 text-gray-700 text-base w-full"
                     />
-                    {isFocused && filtered.length > 0 && (
-                      <div className="absolute top-full left-0 mt-4 w-full bg-white border border-gray-100 rounded-xl shadow-xl z-50 overflow-hidden max-h-60 overflow-y-auto ">
-                        {filtered.map((item, index) => (
-                          <div
-                            key={item}
-                            onMouseDown={() => {
-                              setQuery(item);
-                              setIsFocused(false);
-                            }}
-                            className={`px-4 py-3 text-sm cursor-pointer transition-colors ${
-                              index === focusedIndex
-                                ? "bg-[#4E148C] text-white"
-                                : "hover:bg-gray-50 text-gray-700"
-                            }`}
-                          >
-                            {item}
-                          </div>
-                        ))}
-                      </div>
-                    )}
                   </div>
+                  {isFocused && filtered.length > 0 && dropdownPos && createPortal(
+                    <div
+                      style={{ position: 'fixed', top: dropdownPos.top, left: dropdownPos.left, width: dropdownPos.width, zIndex: 99999 }}
+                      className="bg-white border border-gray-100 rounded-xl shadow-2xl overflow-hidden max-h-60 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
+                    >
+                      {filtered.map((item, index) => (
+                        <div
+                          key={item}
+                          onMouseDown={() => {
+                            setQuery(item);
+                            setIsFocused(false);
+                          }}
+                          className={`px-4 py-3 text-sm cursor-pointer transition-colors ${
+                            index === focusedIndex
+                              ? "bg-[#4E148C] text-white"
+                              : "hover:bg-gray-50 text-gray-700"
+                          }`}
+                        >
+                          {item}
+                        </div>
+                      ))}
+                    </div>
+                  , document.body)}
                 </div>
 
                 <div className="flex-1 bg-[#F4F4F4] rounded-full px-6 py-2 flex items-center gap-3 relative" ref={cityDropdownRef}>
                   <div className="w-5 h-5 flex items-center justify-center">
-                    {isLoadingLocation ? (
-                      <Loader2 className="w-4 h-4 text-gray-400 animate-spin" />
-                    ) : (
-                      <MapPin className="w-4 h-4 text-gray-400" />
-                    )}
+                    <MapPin className="w-4 h-4 text-gray-400" />
                   </div>
                   <div className="flex-1 relative">
                     <input
@@ -306,7 +325,7 @@ export default function HeroSection() {
                       onChange={(e) => handleCityInputChange(e.target.value)}
                       onFocus={() => setIsCityFocused(true)}
                       onKeyDown={handleCityKeyDown}
-                      placeholder={isLoadingLocation ? "Detecting location..." : "Near you or Enter City"}
+                      placeholder="Near you or Enter City"
                       className="border-none bg-transparent p-0 h-auto focus-visible:outline-none placeholder:text-gray-400 text-gray-700 text-base w-full"
                     />
                     {isCityFocused && citySuggestions.length > 0 && (
@@ -461,7 +480,7 @@ export default function HeroSection() {
       </div>
 
       <Dialog open={isConsultModalOpen} onOpenChange={setIsConsultModalOpen}>
-        <DialogContent className="max-w-[95vw] sm:max-w-[90vw] md:max-w-3xl lg:max-w-4xl max-h-[90vh] overflow-y-auto bg-white rounded-[32px] border-none  shadow-lg">
+        <DialogContent showCloseButton={false} className="max-w-[95vw] sm:max-w-[90vw] md:max-w-3xl lg:max-w-4xl max-h-[90vh] overflow-y-auto bg-white rounded-[48px] border-none shadow-lg">
           <ConsultOnline />
         </DialogContent>
       </Dialog>

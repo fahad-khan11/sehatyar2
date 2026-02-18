@@ -11,7 +11,7 @@ export default function Footer() {
                 <p className='mt-6 text-[15px] leading-relaxed text-[#66627f]'>
                     Sehatyar is a complete hospital and clinic management system offering smart appointment scheduling, online consultations, seamless billing, and comprehensive healthcare management across Abbottabad, Mansehra, Haripur, and Battagram.
                 </p>
-            </div>
+            </div>Lahore
 
             {/* Desktop Layout */}
             <div className='hidden md:flex md:gap-6 lg:gap-10 xl:gap-16'>
