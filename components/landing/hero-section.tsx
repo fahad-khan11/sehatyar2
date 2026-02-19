@@ -351,7 +351,7 @@ export default function HeroSection() {
 
                 <Button
                   onClick={() => setIsInClinicModalOpen(true)}
-                  className="bg-[#4E148C] hover:bg-[#ff781e] text-white rounded-full px-6 py-4 h-auto text-base font-medium transition-colors"
+                  className="bg-[#4E148C] hover:bg-[#ff781e] text-white rounded-full px-6 lg:px-9 py-4 h-auto text-base font-medium transition-colors"
                 >
                   Search
                 </Button>
