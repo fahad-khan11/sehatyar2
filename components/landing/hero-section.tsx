@@ -167,7 +167,7 @@ export default function HeroSection() {
   return (
     <section aria-label="Hero section" className="max-w-[1370px] mx-auto mt-10 px-4 md:px-0 relative">
       {/* Main Hero Container */}
-      <div className="relative bg-[#F4F4F4] rounded-[32px] md:rounded-[42px] overflow-hidden min-h-[350px] md:min-h-[380px] lg:min-h-[407px] flex items-center">
+      <div className="relative bg-[#F4F4F4] rounded-[32px] md:rounded-[42px] overflow-hidden min-h-[400px] md:min-h-[450px] lg:min-h-[500px] flex items-center">
         {/* Mobile Background Image */}
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
@@ -185,7 +185,7 @@ export default function HeroSection() {
         <div className="relative z-10 w-full">
           <div className="flex flex-col md:flex-row items-center">
             {/* Left Content */}
-            <div className="w-full md:w-1/2 md:ml-6 lg:ml-10 md:mt-2 lg:mt-3 px-6 py-8 md:py-0">
+            <div className="w-full md:w-1/2 md:ml-6 lg:ml-8 md:mt-2 lg:mt-3 px-6 py-8 md:py-0">
               {/* Badge */}
               <div className="inline-flex items-center gap-2 bg-white border-none px-3 py-1.5 mb-5 rounded-full shadow-sm">
                 <div className="w-2.5 h-2.5 rounded-full bg-[#FF6600]"></div>
@@ -208,14 +208,13 @@ export default function HeroSection() {
               {/* Mobile Location Dropdown */}
               <div className="md:hidden w-full max-w-md mb-2 relative">
                 <div className="flex items-center gap-2 text-gray-700">
-                  <MapPin className="w-4 h-4 text-gray-500" />
+                  <MapPin className="w-5 h-5 text-gray-700" />
                   <div className="flex-1 relative">
                     <input
                       type="text"
                       value={city}
-                      onChange={(e) => handleCityInputChange(e.target.value)}
-                      onFocus={() => setIsCityFocused(true)}
-                      onKeyDown={handleCityKeyDown}
+                      readOnly
+                      onClick={() => setIsInClinicModalOpen(true)}
                       placeholder="Select City"
                       className="bg-transparent border-none outline-none text-gray-700 text-base font-medium cursor-pointer p-0 h-auto focus-visible:outline-none w-full"
                     />
@@ -248,20 +247,21 @@ export default function HeroSection() {
 
               {/* Mobile Search Bar */}
               <div className="md:hidden w-full max-w-md">
-                <div className="bg-white p-4 rounded-[22px] shadow-lg border border-gray-200 flex items-center gap-2">
-                  <div className="flex-1 bg-[#F5F5F5] rounded-[22px] px-4 py-4  flex items-center gap-2">
-                    <Search className="w-4 h-4 text-gray-400" />
+                <div className="bg-white p-2 sm:p-4 rounded-[22px] shadow-lg border border-gray-200 flex items-center gap-1 sm:gap-2">
+                  <div className="flex-1 bg-[#F5F5F5] rounded-[22px] px-3 py-4 flex items-center gap-1.5">
+                    <Search className="w-4 h-4 text-gray-700" />
                     <input
                       type="text"
                       placeholder="Doctors, Hospital, Specialties"
                       value={query}
-                      onChange={(e) => setQuery(e.target.value)}
-                      className="border-none bg-transparent p-0 h-auto focus-visible:outline-none placeholder:text-gray-400 text-gray-700 text-sm w-full"
+                      readOnly
+                      onClick={() => setIsInClinicModalOpen(true)}
+                      className="border-none bg-transparent p-0 h-auto focus-visible:outline-none placeholder:text-gray-600 text-gray-700 text-sm w-full cursor-pointer"
                     />
                   </div>
                   <Button
                     onClick={handleSearch}
-                    className="bg-[#4E148C] hover:bg-[#ff781e] text-white rounded-[22px] px-5 py-4 h-auto text-sm font-medium transition-colors"
+                    className="bg-[#4E148C] hover:bg-[#ff781e] text-white rounded-[22px] px-6 sm:px-10 py-4 h-auto text-sm font-medium transition-colors"
                   >
                     Search
                   </Button>
@@ -270,23 +270,19 @@ export default function HeroSection() {
 
               {/* Desktop Search Bar */}
               <div
-                className="hidden md:flex bg-white p-2 shadow-lg max-w-[1000px] border rounded-full border-gray-100 flex-row gap-2 mt-4 overflow-visible"
+                className="hidden md:flex bg-white p-2 shadow-lg w-full border rounded-full border-gray-100 flex-row gap-2 mt-4 overflow-visible"
                 ref={dropdownRef}
               >
-                <div className="flex-1 relative bg-[#F4F4F4] rounded-full px-6 py-2 flex items-center gap-3 overflow-visible" ref={searchInputRef}>
-                  <Search className="w-5 h-5 text-gray-400" />
+                <div className="flex-1 relative bg-[#F4F4F4] rounded-full px-4 py-2 flex items-center gap-2 overflow-visible" ref={searchInputRef}>
+                  <Search className="w-5 h-5 text-gray-700" />
                   <div className="flex-1">
                     <input
                       type="text"
                       placeholder="Specialist or Hospital"
                       value={query}
-                      onChange={(e) => setQuery(e.target.value)}
-                      onFocus={() => {
-                        setIsFocused(true);
-                        updateDropdownPos();
-                      }}
-                      onKeyDown={handleKeyDown}
-                      className="border-none bg-transparent p-0 h-auto focus-visible:outline-none placeholder:text-gray-400 text-gray-700 text-base w-full"
+                      readOnly
+                      onClick={() => setIsInClinicModalOpen(true)}
+                      className="border-none bg-transparent p-0 h-auto focus-visible:outline-none placeholder:text-gray-600 placeholder:text-sm placeholder:font-medium text-gray-700 text-base w-full cursor-pointer"
                     />
                   </div>
                   {isFocused && filtered.length > 0 && dropdownPos && createPortal(
@@ -314,19 +310,18 @@ export default function HeroSection() {
                   , document.body)}
                 </div>
 
-                <div className="flex-1 bg-[#F4F4F4] rounded-full px-6 py-2 flex items-center gap-3 relative" ref={cityDropdownRef}>
+                <div className="flex-1 bg-[#F4F4F4] rounded-full px-4 py-2 flex items-center gap-2 relative" ref={cityDropdownRef}>
                   <div className="w-5 h-5 flex items-center justify-center">
-                    <MapPin className="w-4 h-4 text-gray-400" />
+                    <MapPin className="w-5 h-5 text-gray-700" />
                   </div>
                   <div className="flex-1 relative">
                     <input
                       type="text"
                       value={city}
-                      onChange={(e) => handleCityInputChange(e.target.value)}
-                      onFocus={() => setIsCityFocused(true)}
-                      onKeyDown={handleCityKeyDown}
+                      readOnly
+                      onClick={() => setIsInClinicModalOpen(true)}
                       placeholder="Near you or Enter City"
-                      className="border-none bg-transparent p-0 h-auto focus-visible:outline-none placeholder:text-gray-400 text-gray-700 text-base w-full"
+                      className="border-none bg-transparent p-0 h-auto focus-visible:outline-none placeholder:text-gray-600 placeholder:text-sm placeholder:font-medium text-gray-700 text-base w-full cursor-pointer"
                     />
                     {isCityFocused && citySuggestions.length > 0 && (
                       <div className="absolute top-full left-0 mt-4 w-full bg-white border border-gray-100 rounded-xl shadow-xl z-50 overflow-hidden max-h-60 overflow-y-auto">
@@ -345,7 +340,7 @@ export default function HeroSection() {
                                 : "hover:bg-gray-50 text-gray-700"
                             }`}
                           >
-                            <MapPin className={`w-4 h-4 ${index === cityFocusedIndex ? "text-white" : "text-gray-400"}`} />
+                            <MapPin className={`w-5 h-5 ${index === cityFocusedIndex ? "text-white" : "text-gray-400"}`} />
                             {suggestion}
                           </div>
                         ))}
@@ -355,7 +350,7 @@ export default function HeroSection() {
                 </div>
 
                 <Button
-                  onClick={handleSearch}
+                  onClick={() => setIsInClinicModalOpen(true)}
                   className="bg-[#4E148C] hover:bg-[#ff781e] text-white rounded-full px-6 py-4 h-auto text-base font-medium transition-colors"
                 >
                   Search
@@ -364,11 +359,11 @@ export default function HeroSection() {
             </div>
 
             {/* Desktop Right Content - Images (inside gray container) */}
-            <div className="hidden md:block md:w-1/2 lg:w-1/2 mt-0">
-              <div className="flex justify-end gap-2 lg:gap-3 items-start md:ml-4 lg:ml-10">
+            <div className="hidden md:block md:w-1/2 lg:w-1/2 mt-0 md:mr-4 lg:mr-8">
+              <div className="flex justify-end gap-4 lg:gap-8 items-stretch md:ml-4 lg:ml-6">
                 {/* Card 1 - Consult Online */}
-                <div className="flex flex-col gap-2 lg:gap-3 w-[180px] lg:w-[260px]">
-                  <div className="relative bg-transparent overflow-hidden h-[130px] lg:h-[200px]">
+                <div className="flex flex-col gap-2 lg:gap-3 w-[200px] lg:w-[285px]">
+                  <div className="relative bg-transparent overflow-hidden h-[150px] lg:h-[230px]">
                     <Image
                       src="/hero-section1.svg"
                       alt="Consult Online"
@@ -377,27 +372,27 @@ export default function HeroSection() {
                       className="object-contain"
                     />
                   </div>
-                  <div className="bg-white rounded-[14px] lg:rounded-[20px] p-2.5 lg:p-4 flex flex-col gap-1 lg:gap-2">
+                  <div className="bg-white rounded-[14px] lg:rounded-[20px] p-2.5 lg:p-6 flex flex-col gap-1 lg:gap-2 flex-1">
                     <div className="flex items-center justify-between gap-2 lg:gap-3">
-                      <h3 className="font-bold text-[#333333] text-xs lg:text-base leading-tight">
+                      <p className="font-semibold text-[#333333] text-sm lg:text-[15px] leading-tight">
                         Consult Online Now
-                      </h3>
+                      </p>
                       <button
                         onClick={() => setIsConsultModalOpen(true)}
-                        className="w-6 h-6 lg:w-9 lg:h-9 bg-[#4E148C] rounded-[10px] lg:rounded-[16.43px] flex items-center justify-center flex-shrink-0 hover:bg-[#ff781e] transition-colors"
+                         className="w-8 h-8 lg:w-11 lg:h-11 bg-[#4E148C] rounded-lg flex items-center justify-center flex-shrink-0 hover:bg-[#ff781e] transition-colors aspect-square"
                       >
-                        <ArrowRight className="w-3 h-3 lg:w-4 lg:h-4 text-white -rotate-45" />
+                        <ArrowRight className="w-3 h-3 lg:w-5 lg:h-5 text-white -rotate-45" />
                       </button>
                     </div>
-                    <p className="text-[9px] lg:text-[11px] text-gray-500 leading-relaxed hidden lg:block">
+                    <p className="text-[10px] lg:text-[13px] text-gray-500 leading-relaxed hidden lg:block">
                       Instantly connect with Specialists through Video call.
                     </p>
                   </div>
                 </div>
 
                 {/* Card 2 - In Clinic */}
-                <div className="w-[140px] lg:w-[250px] mr-1 lg:mr-2 relative">
-                  <div className="relative rounded-[14px] lg:rounded-[20px] overflow-hidden h-[200px] lg:h-[300px] shadow-lg">
+                <div className="w-[160px] lg:w-[285px] mr-1 lg:mr-2 relative flex flex-col">
+                  <div className="relative rounded-[14px] lg:rounded-[20px] overflow-hidden shadow-lg flex-1 min-h-[220px] lg:min-h-[340px]">
                     <Image
                       src="/hero-section2.svg"
                       alt="In Clinic Appointment"
@@ -408,15 +403,15 @@ export default function HeroSection() {
                       <button 
 
                        onClick={() => setIsInClinicModalOpen(true)}
-                        className="w-full bg-[#4E148C] text-white py-1.5 lg:py-2.5 px-2 lg:px-3 rounded-full flex items-center justify-between text-[9px] lg:text-xs font-medium hover:bg-[#ff781e] transition-colors shadow-lg"
+                        className="w-full bg-[#4E148C] text-white py-2.5 lg:py-3 px-3 lg:px-6 rounded-full flex items-center justify-between text-sm lg:text-base font-normal hover:bg-[#ff781e] transition-colors shadow-lg"
                       >
-                        <div className="flex items-center gap-1 lg:gap-2">
+                        <div className="flex items-center gap-1.5 lg:gap-2.5">
                           <div
                            
-                            className="w-1 h-1 lg:w-1.5 lg:h-1.5 rounded-full bg-white" />
+                            className="w-1.5 h-1.5 lg:w-2 lg:h-2 rounded-full bg-white" />
                           In Clinic Appointment
                         </div>
-                        <ArrowRight className="w-2.5 h-2.5 lg:w-3.5 lg:h-3.5 -rotate-45" />
+                        <ArrowRight className="w-3 h-3 lg:w-4 lg:h-4 -rotate-45" />
                       </button>
                     </div>
                   </div>
@@ -429,10 +424,10 @@ export default function HeroSection() {
 
       {/* Mobile Image Cards - OUTSIDE gray container */}
       <div className="md:hidden mt-6 px-2">
-        <div className="flex justify-center gap-3 items-start">
+        <div className="flex justify-center gap-3 items-stretch">
           {/* Card 1 - Consult Online */}
-          <div className="flex flex-col gap-2 flex-1 max-w-[180px]">
-            <div className="relative rounded-[16px] overflow-hidden h-[200px] shadow-md">
+          <div className="flex flex-col gap-2 flex-1 max-w-[200px]">
+            <div className="relative rounded-[16px] overflow-hidden h-full min-h-[220px] shadow-md">
               <Image
                 src="/hero-section1.svg"
                 alt="Consult Online"
@@ -441,21 +436,21 @@ export default function HeroSection() {
               />
             </div>
             <div className="flex items-center justify-between gap-2 py-2">
-              <h3 className="font-bold text-[#333333] text-sm leading-tight">
+              <p className="font-normal text-[#333333] text-[11px] sm:text-sm leading-tight">
                 Consult Online Now
-              </h3>
+              </p>
               <button
                 onClick={() => setIsConsultModalOpen(true)}
-                className="w-8 h-8 bg-[#4E148C] rounded-lg flex items-center justify-center flex-shrink-0 hover:bg-[#ff781e] transition-colors"
+                className="w-8 h-8 bg-[#4E148C] rounded-full flex items-center justify-center flex-shrink-0 hover:bg-[#ff781e] transition-colors"
               >
-                <ArrowRight className="w-3.5 h-3.5 text-white -rotate-45" />
+                <ArrowRight className="w-3 h-3 text-white -rotate-45" />
               </button>
             </div>
           </div>
 
           {/* Card 2 - In Clinic */}
-          <div className="flex-1 max-w-[180px]">
-            <div className="relative rounded-[16px] overflow-hidden h-[260px] shadow-md">
+          <div className="flex flex-col gap-2 flex-1 max-w-[200px]">
+            <div className="relative rounded-[16px] overflow-hidden h-full min-h-[280px] shadow-md">
               <Image
                 src="/hero-section2.svg"
                 alt="In Clinic Appointment"
@@ -465,13 +460,13 @@ export default function HeroSection() {
               <div className="absolute bottom-3 left-2 right-2">
                 <button 
                   onClick={() => setIsInClinicModalOpen(true)}
-                  className="w-full bg-[#4E148C] text-white py-2 px-2 rounded-full flex items-center justify-between text-[10px] font-medium hover:bg-[#ff781e] transition-colors shadow-lg"
+                  className="w-full bg-[#4E148C] text-white py-2 sm:py-3.5 px-2 sm:px-4 rounded-full flex items-center justify-between text-[10px] sm:text-sm font-normal hover:bg-[#ff781e] transition-colors shadow-lg"
                 >
-                  <div className="flex items-center gap-1">
-                    <div className="w-1.5 h-1.5 rounded-full bg-white" />
+                  <div className="flex items-center gap-1 sm:gap-2">
+                    <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-white" />
                     In Clinic Appointment
                   </div>
-                  <ArrowRight className="w-3 h-3 -rotate-45" />
+                  <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4 -rotate-45" />
                 </button>
               </div>
             </div>
