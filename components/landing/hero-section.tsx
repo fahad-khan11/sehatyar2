@@ -475,14 +475,14 @@ export default function HeroSection() {
       </div>
 
       <Dialog open={isConsultModalOpen} onOpenChange={setIsConsultModalOpen}>
-        <DialogContent showCloseButton={false} className="max-w-[95vw] sm:max-w-[90vw] md:max-w-3xl lg:max-w-4xl max-h-[90vh] overflow-y-auto bg-white rounded-[48px] border-none shadow-lg">
+        <DialogContent showCloseButton={false} className="max-w-[95vw] sm:max-w-[90vw] md:max-w-2xl lg:max-w-3xl max-h-[92vh] overflow-y-auto bg-white rounded-[48px] border-none shadow-lg">
           <ConsultOnline />
         </DialogContent>
       </Dialog>
 
       <Dialog open={isInClinicModalOpen} onOpenChange={setIsInClinicModalOpen}>
-        <DialogContent showCloseButton={false} className="bg-transparent border-none shadow-none max-w-[95vw] sm:max-w-[90vw] md:max-w-3xl lg:max-w-4xl p-0 outline-none">
-          <div className="bg-white rounded-[32px] p-6 w-full max-h-[85vh] overflow-y-auto">
+        <DialogContent showCloseButton={false} className="bg-transparent border-none shadow-none max-w-[95vw] sm:max-w-[90vw] md:max-w-2xl lg:max-w-3xl p-0 outline-none">
+          <div className="bg-white rounded-[32px] p-6 lg:p-8 w-full max-h-[92vh] overflow-y-auto">
             <InClinicAppointment />
           </div>
         </DialogContent>
