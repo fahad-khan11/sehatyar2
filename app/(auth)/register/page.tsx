@@ -12,6 +12,174 @@ const GENDER_BG = "#4e148c"
 const GENDER_ACTIVE = "#ff8331"
 const BORDER = "#BDBDBD"
 
+// Extracted outside RegisterPage so React keeps a stable reference and doesn't
+// unmount/remount on every parent re-render (which was destroying the input ref
+// and causing focus loss after selecting a dropdown item).
+const AutocompleteField = ({
+  label,
+  placeholder,
+  inputValue,
+  setInputValue,
+  selectedItems,
+  allOptions,
+  fieldName,
+  dropdownOpen,
+  setDropdownOpen,
+  onAddItem,
+  onRemoveItem,
+}: {
+  label: string
+  placeholder: string
+  inputValue: string
+  setInputValue: (value: string) => void
+  selectedItems: string[]
+  allOptions: string[]
+  fieldName: "primarySpecializations" | "servicesTreatment" | "conditionsTreatment"
+  dropdownOpen: boolean
+  setDropdownOpen: (open: boolean) => void
+  onAddItem: (field: "primarySpecializations" | "servicesTreatment" | "conditionsTreatment", value: string) => void
+  onRemoveItem: (field: "primarySpecializations" | "servicesTreatment" | "conditionsTreatment", value: string) => void
+}) => {
+  const inputRef = useRef<HTMLInputElement | null>(null)
+  const [highlightedIndex, setHighlightedIndex] = useState<number>(-1)
+
+  const normalizedInput = inputValue.trim()
+  const [debouncedInput, setDebouncedInput] = useState(normalizedInput)
+  useEffect(() => {
+    const t = setTimeout(() => setDebouncedInput(normalizedInput.toLowerCase()), 150)
+    return () => clearTimeout(t)
+  }, [normalizedInput])
+
+  const uniqueOptions = useMemo(() => Array.from(new Set(allOptions)), [allOptions])
+  const loweredUniqueOptions = useMemo(() => uniqueOptions.map((o) => o.toLowerCase()), [uniqueOptions])
+
+  const filteredOptions = useMemo(() => {
+    if (!debouncedInput) return uniqueOptions.filter((o) => !selectedItems.includes(o)).slice(0, 8)
+    return uniqueOptions.filter((option, i) => !selectedItems.includes(option) && loweredUniqueOptions[i].includes(debouncedInput))
+  }, [debouncedInput, uniqueOptions, loweredUniqueOptions, selectedItems])
+
+  const focusInput = () => {
+    // Use requestAnimationFrame to ensure focus happens after React re-render
+    requestAnimationFrame(() => {
+      inputRef.current?.focus()
+    })
+  }
+
+  const onKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "ArrowDown") {
+      e.preventDefault()
+      setHighlightedIndex((prev) => Math.min(prev + 1, filteredOptions.length - 1))
+      setDropdownOpen(true)
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault()
+      setHighlightedIndex((prev) => Math.max(prev - 1, 0))
+    } else if (e.key === "Enter") {
+      e.preventDefault()
+      if (highlightedIndex >= 0 && filteredOptions[highlightedIndex]) {
+        onAddItem(fieldName, filteredOptions[highlightedIndex])
+        focusInput()
+      } else {
+        const value = inputValue.trim()
+        if (value) {
+          onAddItem(fieldName, value)
+          focusInput()
+        }
+      }
+    } else if (e.key === "Escape") {
+      setDropdownOpen(false)
+    }
+  }
+
+  return (
+    <div>
+      <label className="block text-[12px] font-medium text-[#343434] mb-3">{label}</label>
+      <div className="relative">
+        <div
+          className="border rounded-[12px] p-4 min-h-[120px] flex flex-wrap gap-3 items-start content-start"
+          style={{ borderColor: BORDER }}
+        >
+          {selectedItems.map((item) => (
+            <div
+              key={item}
+              className="flex items-center justify-between gap-2 px-4 py-2 rounded-full bg-[#f0f0f0] text-[#343434] text-sm"
+            >
+              <span>{item}</span>
+              <button
+                type="button"
+                onClick={() => onRemoveItem(fieldName, item)}
+                className="flex items-center justify-center w-5 h-5 rounded-full bg-[#343434] text-white hover:bg-[#1a1a1a] transition-colors"
+              >
+                ✕
+              </button>
+            </div>
+          ))}
+
+          <input
+            type="text"
+            placeholder={selectedItems.length === 0 ? placeholder : "Add more..."}
+            value={inputValue}
+            onChange={(e) => {
+              setInputValue(e.target.value)
+              setDropdownOpen(true)
+              setHighlightedIndex(-1)
+            }}
+            ref={inputRef}
+            onFocus={() => {
+              setDropdownOpen(true)
+              setHighlightedIndex(-1)
+            }}
+            onBlur={() => setTimeout(() => setDropdownOpen(false), 200)}
+            onKeyDown={onKeyDown}
+            className="flex-1 min-w-[150px] outline-none bg-transparent text-sm text-[#343434]"
+            style={{ minHeight: selectedItems.length === 0 ? "60px" : "auto" }}
+          />
+        </div>
+
+        {dropdownOpen && filteredOptions.length > 0 && (
+          <div
+            className="absolute top-full left-0 right-0 mt-1 border rounded-[12px] bg-white shadow-lg z-10 max-h-52 overflow-auto"
+            style={{ borderColor: BORDER }}
+          >
+            {filteredOptions.map((option, idx) => (
+              <button
+                key={option}
+                type="button"
+                onMouseDown={(e) => {
+                  e.preventDefault() // prevent input blur
+                  onAddItem(fieldName, option)
+                  focusInput()
+                }}
+                onMouseEnter={() => setHighlightedIndex(idx)}
+                className={`w-full text-left px-4 py-3 transition-colors text-sm text-[#343434] border-b last:border-b-0 ${
+                  idx === highlightedIndex ? "bg-[#f0f0f0]" : "hover:bg-[#f9f9f9]"
+                }`}
+                style={{ borderColor: BORDER }}
+              >
+                {option}
+              </button>
+            ))}
+          </div>
+        )}
+
+        {inputValue && !allOptions.map((o) => o.toLowerCase()).includes(inputValue.trim().toLowerCase()) && (
+          <button
+            type="button"
+            onMouseDown={(e) => {
+              e.preventDefault()
+              onAddItem(fieldName, inputValue)
+              focusInput()
+            }}
+            className="absolute right-4 top-4 px-3 py-1 rounded-full text-xs font-medium text-white transition-colors"
+            style={{ background: PRIMARY }}
+          >
+            Add
+          </button>
+        )}
+      </div>
+    </div>
+  )
+}
+
 const RegisterPage = () => {
   const router = useRouter();
   
@@ -269,12 +437,15 @@ for (let entry of formDataToSend.entries()) {
   "Nephrology",
   "Neurocritical Care",
   "Neurodevelopmental Disabilities",
+  "Nerve Doctor",
   "Neurology",
   "Neuromuscular Medicine",
   "Neuroradiology",
   "Neurosurgery",
   "Nuclear Medicine",
   "Obstetrics & Gynecology",
+  "Gynecology",
+  "Gynecologist",
   "Occupational Medicine",
   "Oncology",
   "Ophthalmology",
@@ -421,6 +592,128 @@ for (let entry of formDataToSend.entries()) {
     "Homeopathy",
   ]
   const conditions = [
+    // Shown on landing page carousel
+    "High Blood Pressure",
+    "Piles",
+    "Diarrhea",
+    "Acne",
+    "Pregnancy",
+    "Fever",
+    "Heart Attack",
+    // Cardiovascular
+    "Hypertension",
+    "Low Blood Pressure",
+    "Chest Pain",
+    "Heart Failure",
+    "Arrhythmia",
+    "Stroke",
+    "Angina",
+    "Coronary Artery Disease",
+    "Peripheral Vascular Disease",
+    // Gastrointestinal
+    "Constipation",
+    "Acid Reflux / GERD",
+    "Irritable Bowel Syndrome",
+    "Peptic Ulcer",
+    "Liver Disease",
+    "Hepatitis",
+    "Jaundice",
+    "Hemorrhoids",
+    "Appendicitis",
+    "Gallstones",
+    "Nausea & Vomiting",
+    "Bloating",
+    // Respiratory
+    "Asthma",
+    "Bronchitis",
+    "Pneumonia",
+    "Tuberculosis",
+    "Shortness of Breath",
+    "Cough",
+    "Sinusitis",
+    "Allergic Rhinitis",
+    "Sleep Apnea",
+    // Skin / Dermatology
+    "Eczema",
+    "Psoriasis",
+    "Skin Allergy",
+    "Fungal Infection",
+    "Rash",
+    "Dandruff",
+    "Warts",
+    "Hair Loss",
+    "Vitiligo",
+    // Musculoskeletal
+    "Back Pain",
+    "Knee Pain",
+    "Arthritis",
+    "Joint Pain",
+    "Neck Pain",
+    "Gout",
+    "Osteoporosis",
+    "Fracture",
+    "Sciatica",
+    // Neurological
+    "Migraine",
+    "Headache",
+    "Epilepsy",
+    "Vertigo / Dizziness",
+    "Parkinson's Disease",
+    "Anxiety",
+    "Depression",
+    "Insomnia",
+    "Memory Loss",
+    // Hormonal / Metabolic
+    "Diabetes",
+    "Diabetes Type 1",
+    "Diabetes Type 2",
+    "Thyroid Disorder",
+    "Hypothyroidism",
+    "Hyperthyroidism",
+    "PCOS",
+    "Obesity",
+    "High Cholesterol",
+    // Urinary / Renal
+    "Kidney Stones",
+    "Urinary Tract Infection",
+    "Kidney Disease",
+    "Prostate Problems",
+    "Incontinence",
+    // Eye / ENT
+    "Eye Infection",
+    "Cataract",
+    "Glaucoma",
+    "Ear Infection",
+    "Tonsillitis",
+    "Hearing Loss",
+    "Nasal Polyps",
+    // Women's Health
+    "Menstrual Disorders",
+    "PCOS",
+    "Infertility",
+    "Menopause",
+    "Uterine Fibroids",
+    "Endometriosis",
+    // Children's Health
+    "Growth Disorders",
+    "Childhood Asthma",
+    "Malnutrition",
+    "Developmental Delay",
+    // Dental
+    "Toothache",
+    "Gum Disease",
+    "Tooth Decay",
+    "Mouth Ulcer",
+    // Other
+    "Anemia",
+    "Dehydration",
+    "Malaria",
+    "Dengue",
+    "Typhoid",
+    "COVID-19",
+    "Chickenpox",
+    "Weight Loss",
+    "Fatigue",
     "Cupping Therapy",
     "Acupuncture",
     "Massage Therapy",
@@ -435,11 +728,9 @@ for (let entry of formDataToSend.entries()) {
         ...prev,
         [field]: [...prev[field], value],
       }))
-      // Clear input and close dropdown
       if (field === "primarySpecializations") setSpecializationInput("")
       if (field === "servicesTreatment") setTreatmentInput("")
       if (field === "conditionsTreatment") setConditionInput("")
-      setOpenDropdown(null)
     }
   }
 
@@ -456,165 +747,7 @@ for (let entry of formDataToSend.entries()) {
     )
   }
 
-  const AutocompleteField = ({
-    label,
-    placeholder,
-    inputValue,
-    setInputValue,
-    selectedItems,
-    allOptions,
-    fieldName,
-    dropdownOpen,
-    setDropdownOpen,
-  }: {
-    label: string
-    placeholder: string
-    inputValue: string
-    setInputValue: (value: string) => void
-    selectedItems: string[]
-    allOptions: string[]
-    fieldName: "primarySpecializations" | "servicesTreatment" | "conditionsTreatment"
-    dropdownOpen: boolean
-    setDropdownOpen: (open: boolean) => void
-  }) => {
-    // Normalized matching and keyboard navigation with debounce and focus retention
-    const inputRef = useRef<HTMLInputElement | null>(null)
-    const [highlightedIndex, setHighlightedIndex] = useState<number>(-1)
 
-    // debounce the input to improve performance on large lists
-    const normalizedInput = inputValue.trim()
-    const [debouncedInput, setDebouncedInput] = useState(normalizedInput)
-    useEffect(() => {
-      const t = setTimeout(() => setDebouncedInput(normalizedInput.toLowerCase()), 150)
-      return () => clearTimeout(t)
-    }, [normalizedInput])
-
-    // dedupe options to avoid duplicate keys
-    const uniqueOptions = useMemo(() => Array.from(new Set(allOptions)), [allOptions])
-    const loweredUniqueOptions = useMemo(() => uniqueOptions.map((o) => o.toLowerCase()), [uniqueOptions])
-
-    const filteredOptions = useMemo(() => {
-      if (!debouncedInput) return uniqueOptions.filter((o) => !selectedItems.includes(o)).slice(0, 8)
-      return uniqueOptions.filter((option, i) => !selectedItems.includes(option) && loweredUniqueOptions[i].includes(debouncedInput))
-    }, [debouncedInput, uniqueOptions, loweredUniqueOptions, selectedItems])
-
-    const onKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-      if (e.key === "ArrowDown") {
-        e.preventDefault()
-        setHighlightedIndex((prev) => Math.min(prev + 1, filteredOptions.length - 1))
-        setDropdownOpen(true)
-      } else if (e.key === "ArrowUp") {
-        e.preventDefault()
-        setHighlightedIndex((prev) => Math.max(prev - 1, 0))
-      } else if (e.key === "Enter") {
-        e.preventDefault()
-        if (highlightedIndex >= 0 && filteredOptions[highlightedIndex]) {
-          addItem(fieldName, filteredOptions[highlightedIndex])
-          // re-focus the input after selecting
-          setTimeout(() => inputRef.current?.focus(), 0)
-        } else {
-          const value = inputValue.trim()
-          if (value) {
-            addItem(fieldName, value)
-            setTimeout(() => inputRef.current?.focus(), 0)
-          }
-        }
-      } else if (e.key === "Escape") {
-        setDropdownOpen(false)
-      }
-    }
-
-    return (
-      <div>
-        <label className="block text-[12px] font-medium text-[#343434] mb-3">{label}</label>
-        <div className="relative">
-          <div
-            className="border rounded-[12px] p-4 min-h-[120px] flex flex-wrap gap-3 items-start content-start"
-            style={{ borderColor: BORDER }}
-          >
-            {selectedItems.map((item) => (
-              <div
-                key={item}
-                className="flex items-center justify-between gap-2 px-4 py-2 rounded-full bg-[#f0f0f0] text-[#343434] text-sm"
-              >
-                <span>{item}</span>
-                <button
-                  type="button"
-                  onClick={() => removeItem(fieldName, item)}
-                  className="flex items-center justify-center w-5 h-5 rounded-full bg-[#343434] text-white hover:bg-[#1a1a1a] transition-colors"
-                >
-                  ✕
-                </button>
-              </div>
-            ))}
-
-            {/* Input field inside container */}
-            <input
-              type="text"
-              placeholder={selectedItems.length === 0 ? placeholder : "Add more..."}
-              value={inputValue}
-              onChange={(e) => {
-                setInputValue(e.target.value)
-                setDropdownOpen(true)
-                setHighlightedIndex(-1)
-              }}
-              ref={inputRef}
-              onFocus={() => {
-                setDropdownOpen(true)
-                setHighlightedIndex(-1)
-              }}
-              onBlur={() => setTimeout(() => setDropdownOpen(false), 200)}
-              onKeyDown={onKeyDown}
-              className="flex-1 min-w-[150px] outline-none bg-transparent text-sm text-[#343434]"
-              style={{ minHeight: selectedItems.length === 0 ? "60px" : "auto" }}
-            />
-          </div>
-
-          {/* Dropdown suggestions */}
-          {dropdownOpen && filteredOptions.length > 0 && (
-            <div
-              className="absolute top-full left-0 right-0 mt-1 border rounded-[12px] bg-white shadow-lg z-10 max-h-52 overflow-auto"
-              style={{ borderColor: BORDER }}
-            >
-              {filteredOptions.map((option, idx) => (
-                <button
-                  key={option}
-                  type="button"
-                  onMouseDown={() => {
-                    addItem(fieldName, option)
-                    // keep typing: focus input after selection
-                    setTimeout(() => inputRef.current?.focus(), 0)
-                  }}
-                  onMouseEnter={() => setHighlightedIndex(idx)}
-                  className={`w-full text-left px-4 py-3 transition-colors text-sm text-[#343434] border-b last:border-b-0 ${
-                    idx === highlightedIndex ? "bg-[#f0f0f0]" : "hover:bg-[#f9f9f9]"
-                  }`}
-                  style={{ borderColor: BORDER }}
-                >
-                  {option}
-                </button>
-              ))}
-            </div>
-          )}
-
-          {/* Add custom item button */}
-          {inputValue && !allOptions.map((o) => o.toLowerCase()).includes(inputValue.trim().toLowerCase()) && (
-            <button
-              type="button"
-              onMouseDown={() => {
-                addItem(fieldName, inputValue)
-                setTimeout(() => inputRef.current?.focus(), 0)
-              }}
-              className="absolute right-4 top-4 px-3 py-1 rounded-full text-xs font-medium text-white transition-colors"
-              style={{ background: PRIMARY }}
-            >
-              Add
-            </button>
-          )}
-        </div>
-      </div>
-    )
-  }
 
   // Add this function to handle file upload
   const handleProfilePicChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -911,7 +1044,7 @@ for (let entry of formDataToSend.entries()) {
                   placeholder="Dr."
                   value={formData.title}
                   onChange={(e) => setFormData((prev) => ({ ...prev, title: e.target.value }))}
-                  className="w-full h-[63px] rounded-[12px] border px-4 text-sm outline-none"
+                  className="w-full h-[63px] rounded-[12px] border px-4 text-sm outline-none bg-white text-[#343434] placeholder:text-gray-400"
                   style={{ borderColor: BORDER }}
                 />
               </div>
@@ -924,7 +1057,7 @@ for (let entry of formDataToSend.entries()) {
                   placeholder="15"
                   value={formData.yearsOfExperience}
                   onChange={(e) => setFormData((prev) => ({ ...prev, yearsOfExperience: e.target.value }))}
-                  className="w-full h-[63px] rounded-[12px] border px-4 text-sm outline-none"
+                  className="w-full h-[63px] rounded-[12px] border px-4 text-sm outline-none bg-white text-[#343434] placeholder:text-gray-400"
                   style={{ borderColor: BORDER }}
                 />
               </div>
@@ -946,6 +1079,8 @@ for (let entry of formDataToSend.entries()) {
                   fieldName="primarySpecializations"
                   dropdownOpen={openDropdown === "specialization"}
                   setDropdownOpen={(open) => setOpenDropdown(open ? "specialization" : null)}
+                  onAddItem={addItem}
+                  onRemoveItem={removeItem}
                 />
               </div>
               {/* Services Treatment Offer */}
@@ -963,6 +1098,8 @@ for (let entry of formDataToSend.entries()) {
                   fieldName="servicesTreatment"
                   dropdownOpen={openDropdown === "treatment"}
                   setDropdownOpen={(open) => setOpenDropdown(open ? "treatment" : null)}
+                  onAddItem={addItem}
+                  onRemoveItem={removeItem}
                 />
               </div>
             </div>
@@ -979,6 +1116,8 @@ for (let entry of formDataToSend.entries()) {
                 fieldName="conditionsTreatment"
                 dropdownOpen={openDropdown === "condition"}
                 setDropdownOpen={(open) => setOpenDropdown(open ? "condition" : null)}
+                onAddItem={addItem}
+                onRemoveItem={removeItem}
               />
 
               {/* Education */}
@@ -1045,7 +1184,7 @@ for (let entry of formDataToSend.entries()) {
                 onChange={(e) =>
                   setFormData((prev) => ({ ...prev, FeesPerConsultation: e.target.value }))
                 }
-                className="w-full h-[63px] rounded-[12px] border px-4 text-sm outline-none"
+                className="w-full h-[63px] rounded-[12px] border px-4 text-sm outline-none bg-white text-[#343434] placeholder:text-gray-400"
                 style={{ borderColor: BORDER }}
               />
             </div>
@@ -1118,7 +1257,7 @@ for (let entry of formDataToSend.entries()) {
                       degreeName: e.target.value
                     }))}
                     placeholder="e.g., MBBS, MD, Ph.D."
-                    className="w-full h-10 rounded border px-3 text-sm outline-none"
+                    className="w-full h-10 rounded border px-3 text-sm outline-none bg-white text-[#343434]"
                   />
                 </div>
                 
@@ -1134,7 +1273,7 @@ for (let entry of formDataToSend.entries()) {
                       institute: e.target.value
                     }))}
                     placeholder="e.g., Harvard Medical School"
-                    className="w-full h-10 rounded border px-3 text-sm outline-none"
+                    className="w-full h-10 rounded border px-3 text-sm outline-none bg-white text-[#343434]"
                   />
                 </div>
                 
@@ -1150,7 +1289,7 @@ for (let entry of formDataToSend.entries()) {
                       fieldOfStudy: e.target.value
                     }))}
                     placeholder="e.g., Medicine, Cardiology"
-                    className="w-full h-10 rounded border px-3 text-sm outline-none"
+                    className="w-full h-10 rounded border px-3 text-sm outline-none bg-white text-[#343434]"
                   />
                 </div>
               </div>

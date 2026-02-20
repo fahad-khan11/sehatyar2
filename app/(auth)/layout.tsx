@@ -39,7 +39,6 @@ export const metadata: Metadata = {
 };
 
 import { ReactNode } from "react";
-import Header from "@/components/ui/header";
 import { Toaster } from "react-hot-toast";
 
 

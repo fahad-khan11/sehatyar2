@@ -32,6 +32,8 @@ const specializations = [
   "Nephrology",
   "Neurology",
   "Obstetrics & Gynecology",
+  "Gynecology",
+  "Gynecologist",
   "Oncology",
   "Ophthalmology",
   "Orthopedic Surgery",

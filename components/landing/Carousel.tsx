@@ -7,21 +7,19 @@ import { useRouter } from 'next/navigation'
 import { useLocation } from '@/src/contexts/LocationContext'
 
 const specialistsData = [
-  { name: 'Dermatology', icon: '/images1/dermatologist.png' },
-  { name: 'Gynecology', icon: '/images1/gynco.png' },
-  { name: 'Gastroenterology', icon: '/images1/gestro.png' },
-  { name: 'Urology', icon: '/images1/urologist.png' },
-  { name: 'Dentistry', icon: '/images1/dentist.png' },
-  { name: 'Obesity', icon: '/images1/obesity.png' },
-  { name: 'Orthopedic', icon: '/images1/ortheo.png' },
-  { name: 'ENT', icon: '/images1/ent.png' },
+  { name: 'Dermatology', icon: '/images1/dermatologist.png', searchQuery: 'Dermatology' },
+  { name: 'Gynecology', icon: '/images1/gynco.png', searchQuery: 'Gynecology' },
+  { name: 'Gastroenterology', icon: '/images1/gestro.png', searchQuery: 'Gastroenterology' },
+  { name: 'Urology', icon: '/images1/urologist.png', searchQuery: 'Urology' },
+  { name: 'Dentistry', icon: '/images1/dentist.png', searchQuery: 'Dental' },
+  { name: 'Obesity', icon: '/images1/obesity.png', searchQuery: 'Obesity' },
+  { name: 'Orthopedic', icon: '/images1/ortheo.png', searchQuery: 'Orthopedic' },
+  { name: 'ENT', icon: '/images1/ent.png', searchQuery: 'Otolaryngology' },
 ]
 
-// Repeat the list as requested
 const specialists = [...specialistsData, ...specialistsData, ...specialistsData]
 
-// Group specialists into chunks of 6 for mobile carousel (2 rows x 3 columns)
-type Specialist = { name: string; icon: string }
+type Specialist = { name: string; icon: string; searchQuery: string }
 const mobileChunks: Specialist[][] = []
 for (let i = 0; i < specialists.length; i += 6) {
   mobileChunks.push(specialists.slice(i, i + 6))
@@ -85,9 +83,9 @@ export default function Carousel() {
   }
 
   // Handle click on specialist to navigate to doctor search page
-  const handleSpecialistClick = (specialistName: string) => {
+  const handleSpecialistClick = (specialist: Specialist) => {
     router.push(
-      `/doctor?query=${encodeURIComponent(specialistName)}&city=${encodeURIComponent(city ||'Abbottabad')}`
+      `/doctor?query=${encodeURIComponent(specialist.searchQuery)}&city=${encodeURIComponent(city ||'Abbottabad')}`
     )
   }
 
@@ -132,7 +130,7 @@ export default function Carousel() {
                   <div 
                     key={index} 
                     className="flex flex-col items-center gap-2 group cursor-pointer"
-                    onClick={() => handleSpecialistClick(specialist.name)}
+                    onClick={() => handleSpecialistClick(specialist)}
                   >
                     <div className="relative w-16 h-16 rounded-full bg-[#3D0F6E] flex items-center justify-center transition-all duration-300 group-hover:bg-[#ff6600]">
                       <Image
@@ -185,7 +183,7 @@ export default function Carousel() {
               <div 
                 key={index} 
                 className="flex flex-col items-center gap-4 group cursor-pointer min-w-[120px] snap-start"
-                onClick={() => handleSpecialistClick(specialist.name)}
+                onClick={() => handleSpecialistClick(specialist)}
               >
                 <div className="relative w-24 h-24 rounded-full bg-[#3D0F6E] flex items-center justify-center transition-all duration-300 group-hover:bg-[#ff6600] z-10">
                   <Image

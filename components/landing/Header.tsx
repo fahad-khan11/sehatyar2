@@ -71,49 +71,49 @@ export default function Header() {
     {
       name: "Cardiology",
       cities: [
-        "Cardiologist in Abbottobad",
-        "Cardiologist in Lahore",
-        "Cardiologist in Islamabad",
+        "Cardiologist in Abbottabad",
+        "Cardiologist in Haripur",
+        "Cardiologist in Battagram",
       ],
     },
     {
       name: "Gynecology",
       cities: [
-        "Gynecologist in Abbottobad",
-        "Gynecologist in Lahore",
-        "Gynecologist in Islamabad",
+        "Gynecologist in Abbottabad",
+        "Gynecologist in Haripur",
+        "Gynecologist in Battagram",
       ],
     },
     {
       name: "Urology",
       cities: [
-        "Urologist in Abbottobad",
-        "Urologist in Lahore",
-        "Urologist in Islamabad",
+        "Urologist in Abbottabad",
+        "Urologist in Haripur",
+        "Urologist in Battagram",
       ],
     },
     {
       name: "Gastroenterology",
       cities: [
-        "Gastroenterologist in Abbottobad",
-        "Gastroenterologist in Lahore",
-        "Gastroenterologist in Islamabad",
+        "Gastroenterologist in Abbottabad",
+        "Gastroenterologist in Haripur",
+        "Gastroenterologist in Battagram",
       ],
     },
     {
       name: "Neurology",
       cities: [
-        "Neurologist in Abbottobad",
-        "Neurologist in Lahore",
-        "Neurologist in Islamabad",
+        "Neurologist in Abbottabad",
+        "Neurologist in Haripur",
+        "Neurologist in Battagram",
       ],
     },
     {
       name: "Dental Surgery",
       cities: [
-        "Dental Surgery in Abbottobad",
-        "Dental Surgery in Lahore",
-        "Dental Surgery in Islamabad",
+        "Dental Surgery in Abbottabad",
+        "Dental Surgery in Haripur",
+        "Dental Surgery in Battagram",
       ],
     },
   ];
@@ -122,27 +122,27 @@ export default function Header() {
 
   const clinics = [
     {
-      name: "Lahore Clinics",
+      name: "Abbottabad Clinics",
       hospitals: [
-        "Doctors Hospital",
-        "Hameed Latif Hospital",
-        "Evercare Hospital",
+        "Ayub Teaching Hospital",
+        "Combined Military Hospital Abbottabad",
+        "District Headquarters Hospital",
       ],
     },
     {
-      name: "Karachi Clinics",
+      name: "Haripur Clinics",
       hospitals: [
-        "Agha Khan Hospital",
-        "South City Hospital",
-        "Liaquat National Hospital",
+        "DHQ Hospital Haripur",
+        "Al-Khidmat Hospital Haripur",
+        "Rural Health Centre Haripur",
       ],
     },
     {
-      name: "Islamabad Clinics",
+      name: "Battagram Clinics",
       hospitals: [
-        "Shifa International",
-        "PIMS Hospital",
-        "Ali Medical Centre",
+        "DHQ Hospital Battagram",
+        "Basic Health Unit Battagram",
+        "Al-Mustafa Medical Centre",
       ],
     },
   ];

@@ -4,24 +4,24 @@ import { cn } from '@/lib/utils'
 import Link from 'next/link';
 
 const doctorSpecialties = [
-  { id: 1, name: 'Cardiology', icon: '/assets/specialityIcons/Dermatologist.png', isOnline: true },
-  { id: 2, name: 'Gynecologist', icon: '/assets/specialityIcons/Gynecologist.png', isOnline: true },
-  { id: 3, name: 'Gastroenterologist', icon: '/assets/specialityIcons/Cardiologist.png', isOnline: true },
-  { id: 4, name: 'Urologist', icon: '/assets/specialityIcons/Urologist.png', isOnline: true },
-  { id: 5, name: 'Dentist', icon: '/assets/specialityIcons/Dentist.png', isOnline: true },
-  { id: 6, name: 'Obesity Specialist', icon: '/assets/specialityIcons/ObesitySpecialist.png', isOnline: true },
-  { id: 7, name: 'ENT Specialist', icon: '/assets/specialityIcons/ENTSpecialist.png', isOnline: true },
-  { id: 8, name: 'Orthopedic Surgeon', icon: '/assets/specialityIcons/OrthopedicSurgeon.png', isOnline: true },
-  { id: 9, name: 'Sexologist', icon: '/assets/specialityIcons/Sexologist.png', isOnline: true },
-  { id: 10, name: 'Neurologist', icon: '/assets/specialityIcons/Neurologist.png', isOnline: true },
-  { id: 11, name: 'Child Specialist', icon: '/assets/specialityIcons/ChildSpecialist.png', isOnline: true },
-  { id: 12, name: 'Pulmonologist', icon: '/assets/specialityIcons/Pulmonologist.png', isOnline: true },
-
+  { id: 1,  name: 'Cardiology',        searchQuery: 'Cardiology',        icon: '/assets/specialityIcons/Dermatologist.png',    isOnline: true },
+  { id: 2,  name: 'Gynecologist',      searchQuery: 'Gynecology',        icon: '/assets/specialityIcons/Gynecologist.png',     isOnline: true },
+  { id: 3,  name: 'Gastroenterologist',searchQuery: 'Gastroenterology',  icon: '/assets/specialityIcons/Cardiologist.png',     isOnline: true },
+  { id: 4,  name: 'Urologist',         searchQuery: 'Urology',           icon: '/assets/specialityIcons/Urologist.png',        isOnline: true },
+  { id: 5,  name: 'Dentist',           searchQuery: 'Dental Surgery',    icon: '/assets/specialityIcons/Dentist.png',          isOnline: true },
+  { id: 6,  name: 'Obesity Specialist',searchQuery: 'Obesity',           icon: '/assets/specialityIcons/ObesitySpecialist.png',isOnline: true },
+  { id: 7,  name: 'ENT Specialist',    searchQuery: 'Otolaryngology',    icon: '/assets/specialityIcons/ENTSpecialist.png',    isOnline: true },
+  { id: 8,  name: 'Orthopedic Surgeon',searchQuery: 'Orthopedic Surgery',icon: '/assets/specialityIcons/OrthopedicSurgeon.png',isOnline: true },
+  { id: 9,  name: 'Sexologist',        searchQuery: 'Sexology',          icon: '/assets/specialityIcons/Sexologist.png',       isOnline: true },
+  { id: 10, name: 'Neurologist',       searchQuery: 'Neurology',         icon: '/assets/specialityIcons/Neurologist.png',      isOnline: true },
+  { id: 11, name: 'Child Specialist',  searchQuery: 'Pediatrics',        icon: '/assets/specialityIcons/ChildSpecialist.png',  isOnline: true },
+  { id: 12, name: 'Pulmonologist',     searchQuery: 'Pulmonary Disease', icon: '/assets/specialityIcons/Pulmonologist.png',    isOnline: true },
 ];
 
 // Doctor card component
-const DoctorCard = ({ name, isOnline, icon }: {
+const DoctorCard = ({ name, searchQuery, isOnline, icon }: {
   name: string;
+  searchQuery: string;
   isOnline: boolean;
   icon: string;
 }) => {
@@ -29,16 +29,15 @@ const DoctorCard = ({ name, isOnline, icon }: {
     <Link href={{
             pathname: "/doctor",
             query: {
-              query: name, // specialization name
-              
+              query: searchQuery,
             },
           }}>
-    <div className="group flex items-center py-4 px-5 sm:py-3 sm:px-4 transition-all rounded-[2rem] border-[1px] border-gray-300 gap-4 hover:bg-[#F9F9F9]">
-      <div className='bg-[#4e148c] group-hover:bg-[#ff6701] p-3 sm:p-4 rounded-full flex-shrink-0 transition-colors duration-200'>
-        <Image src={icon} alt={name} width={20} height={20} className='w-6 h-6 sm:w-5 sm:h-5 invert brightness-0 contrast-200'/>
+    <div className="group flex items-center h-20 px-4 sm:px-5 transition-all rounded-[2rem] border-[1px] border-gray-300 gap-3 sm:gap-4 hover:bg-[#F9F9F9]">
+      <div className='bg-[#4e148c] group-hover:bg-[#ff6701] p-3 rounded-full flex-shrink-0 transition-colors duration-200'>
+        <Image src={icon} alt={name} width={20} height={20} className='w-5 h-5 invert brightness-0 contrast-200'/>
       </div>
-      <div className='flex flex-col gap-1.5'>
-        <h3 className="text-sm sm:text-base font-semibold text-gray-900">{name}</h3>
+      <div className='flex flex-col gap-1.5 min-w-0'>
+        <h3 className="text-sm sm:text-[15px] font-semibold text-gray-900 leading-tight">{name}</h3>
         <span className={cn(
           "px-3 py-0.5 text-xs font-medium rounded-full w-fit transition-colors duration-200",
           isOnline
@@ -88,6 +87,7 @@ export default function ConsultOnline() {
           <DoctorCard
             key={doctor.id}
             name={doctor.name}
+            searchQuery={doctor.searchQuery}
             isOnline={doctor.isOnline}
             icon={doctor.icon}
           />
