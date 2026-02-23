@@ -17,7 +17,6 @@ export default function DoctorByCondition() {
                         <Image src="/images/store2.svg" alt="App Store 2" className='w-[140px] md:w-[180px]' width={180} height={50}/>
                     </div>
                 </div>
-                {/* Mobile View Image (small screens) - independent, overflows above */}
             </div>
             {/* Mobile phone - absolutely positioned, independent of card height */}
             <div className='md:hidden absolute bottom-0 right-4 z-[100]'>

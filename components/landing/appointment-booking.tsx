@@ -399,7 +399,7 @@ export default function AppointmentBooking() {
 
   if (loading) {
     return (
-      <main className="w-full min-h-screen flex items-center justify-center">
+      <main className="w-full min-h-screen flex items-cengit adter justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#4e148c]"></div>
       </main>
     )
