@@ -2,7 +2,6 @@ import axios from "axios"
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL||"https://sehatyarr-c23468ec8014.herokuapp.com/"
 
-const accessToken = localStorage.getItem("access_token");
 
 export const createClinic = async (payload: {
   name: string;
@@ -55,6 +54,7 @@ export const getIndividualDoctors = async () => {
 
 export const createIndividualDoctorProfile = async (payload: FormData) => {
   try {
+    const accessToken = localStorage.getItem("access_token");
     const response = await axios.post(`${BASE_URL}doctor-profile/individual/doctor`, payload, {
       headers: {
         "Content-Type": "multipart/form-data",
@@ -180,6 +180,7 @@ export const loginUser = async (payload: any) => {
 
 export const getClinicDashboardOverview = async () => {
   try {
+    const accessToken = localStorage.getItem("access_token");
     const response = await axios.get(`${BASE_URL}clinic/stats/overview`,
       {
         headers: {
@@ -198,6 +199,7 @@ export const getClinicDashboardOverview = async () => {
 
 export const getDoctorsByClinic = async () => {
   try {
+    const accessToken = localStorage.getItem("access_token");
     const response = await axios.get(`${BASE_URL}doctor-profile/by/clinic`, {
       headers: {
         Authorization: `Bearer ${accessToken}`,
@@ -213,6 +215,7 @@ export const getDoctorsByClinic = async () => {
 
 export const createDoctorProfileForClinic = async (payload: FormData) => {
   try {
+    const accessToken = localStorage.getItem("access_token");
     const response = await axios.post(`${BASE_URL}doctor-profile/by/clinic`, payload, {
       headers: {
         "Content-Type": "multipart/form-data",
@@ -228,6 +231,7 @@ export const createDoctorProfileForClinic = async (payload: FormData) => {
 
 export const getPatientsByClinic = async () => {
   try {
+    const accessToken = localStorage.getItem("access_token");
     const response = await axios.get(`${BASE_URL}users/by/clinic?role=patient`, {
       headers: {
         Authorization: `Bearer ${accessToken}`,
@@ -258,6 +262,7 @@ export const createPatientForClinic = async (payload: any) => {
 
 export const getReceptionistsByClinic = async () => {
   try {
+    const accessToken = localStorage.getItem("access_token");
     const response = await axios.get(`${BASE_URL}users/by/clinic?role=clinic_receptionist`, {
       headers: {
         Authorization: `Bearer ${accessToken}`,
