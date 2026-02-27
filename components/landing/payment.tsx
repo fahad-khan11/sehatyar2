@@ -57,10 +57,10 @@ export default function Payment() {
     icon: string;
     sub?: string;
   }> = [
-    { id: "card", label: "Credit or Debit Card", icon: "/visa.svg" },
-    { id: "easypaisa", label: "EasyPaisa", icon: "/easypaisa.svg" },
-    { id: "jazzcash", label: "Jazz Cash", icon: "/jazzcash.svg" },
-    { id: "bank", label: "Bank Transfer", icon: "/bank.svg" },
+    { id: "card", label: "Credit or Debit Card", icon: "/appointment/1.png" },
+    { id: "easypaisa", label: "EasyPaisa", icon: "/appointment/2.png" },
+    { id: "jazzcash", label: "Jazz Cash", icon: "/appointment/3.png" },
+    { id: "bank", label: "Bank Transfer", icon: "/appointment/4.png" },
   ];
 
   const handlePayment = async () => {

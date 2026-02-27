@@ -548,7 +548,7 @@ export default function AppointmentsPage() {
                     <TableHeader>
                       <TableRow>
                         <TableHead>Patient</TableHead>
-                        <TableHead className="table-cell">Doctor</TableHead>
+                        {/* <TableHead className="table-cell">Doctor</TableHead> */}
                         <TableHead>{tabValue === "today" ? "Time" : "Date & Time"}</TableHead>
                         <TableHead>Status</TableHead>
                         <TableHead className="table-cell">Type</TableHead>
@@ -571,7 +571,7 @@ export default function AppointmentsPage() {
                               </div>
                             </div>
                           </TableCell>
-                          <TableCell className="table-cell">{appointment.doctor}</TableCell>
+                          {/* <TableCell className="table-cell">{appointment.doctor}</TableCell> */}
                           <TableCell>
                             <div>
                               {tabValue !== "today" && <p>{appointment.date}</p>}

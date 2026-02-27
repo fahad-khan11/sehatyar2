@@ -24,23 +24,315 @@ const CITIES = [
 ];
 
 const SPECIALIZATIONS = [
-  "Allergy and Immunology", "Anesthesiology", "Cardiology", "Dermatology", 
-  "Emergency Medicine", "Endocrinology", "Family Medicine", "Gastroenterology", 
-  "General Surgery", "Hematology", "Infectious Disease", "Internal Medicine", 
-  "Nephrology", "Neurology", "Obstetrics & Gynecology", "Oncology", 
-  "Ophthalmology", "Orthopedic Surgery", "Otolaryngology (ENT)", "Pathology", 
-  "Pediatrics", "Physical Medicine & Rehabilitation", "Plastic Surgery", 
-  "Psychiatry", "Pulmonology", "Radiology", "Rheumatology", "Urology"
+  "Allergy and Immunology",
+  "Anesthesiology",
+  "Cardiology",
+  "Cardiothoracic Surgery",
+  "Cardiovascular Surgery",
+  "Clinical Neurophysiology",
+  "Clinical Pharmacology",
+  "Colon and Rectal Surgery",
+  "Community Medicine",
+  "Critical Care Medicine",
+  "Dental Surgery",
+  "Dermatology",
+  "Diagnostic Radiology",
+  "Emergency Medicine",
+  "Endocrinology, Diabetes & Metabolism",
+  "Family Medicine",
+  "Gastroenterology",
+  "General Practice",
+  "General Surgery",
+  "Genetics and Genomics",
+  "Geriatric Medicine",
+  "Gynecologic Oncology",
+  "Hand Surgery",
+  "Head and Neck Surgery",
+  "Hematology",
+  "Hepatology",
+  "Hospital Medicine",
+  "Infectious Disease",
+  "Internal Medicine",
+  "Interventional Cardiology",
+  "Interventional Radiology",
+  "Legal Medicine",
+  "Maternal and Fetal Medicine",
+  "Medical Oncology",
+  "Medical Toxicology",
+  "Neonatal-Perinatal Medicine",
+  "Nephrology",
+  "Neurocritical Care",
+  "Neurodevelopmental Disabilities",
+  "Nerve Doctor",
+  "Neurology",
+  "Neuromuscular Medicine",
+  "Neuroradiology",
+  "Neurosurgery",
+  "Nuclear Medicine",
+  "Obstetrics & Gynecology",
+  "Gynecology",
+  "Gynecologist",
+  "Occupational Medicine",
+  "Oncology",
+  "Ophthalmology",
+  "Optometry",
+  "Oral and Maxillofacial Surgery",
+  "Orthopedic Surgery",
+  "Otolaryngology (ENT)",
+  "Pain Medicine",
+  "Palliative Care",
+  "Pathology",
+  "Pediatric Allergy & Immunology",
+  "Pediatric Anesthesiology",
+  "Pediatric Cardiology",
+  "Pediatric Critical Care Medicine",
+  "Pediatric Dermatology",
+  "Pediatric Emergency Medicine",
+  "Pediatric Endocrinology",
+  "Pediatric Gastroenterology",
+  "Pediatric Hematology & Oncology",
+  "Pediatric Infectious Diseases",
+  "Pediatric Nephrology",
+  "Pediatric Neurology",
+  "Pediatric Neurosurgery",
+  "Pediatric Oncology",
+  "Pediatric Ophthalmology",
+  "Pediatric Orthopedics",
+  "Pediatric Otolaryngology",
+  "Pediatric Pathology",
+  "Pediatric Pulmonology",
+  "Pediatric Radiology",
+  "Pediatric Rheumatology",
+  "Pediatric Surgery",
+  "Pediatric Urology",
+  "Pediatrics",
+  "Physical Medicine & Rehabilitation",
+  "Plastic Surgery",
+  "Preventive Medicine",
+  "Psychiatry",
+  "Psychosomatic Medicine",
+  "Public Health",
+  "Pulmonary Disease",
+  "Radiation Oncology",
+  "Radiology",
+  "Reproductive Endocrinology and Infertility",
+  "Rheumatology",
+  "Sleep Medicine",
+  "Spinal Cord Injury Medicine",
+  "Sports Medicine",
+  "Surgical Critical Care",
+  "Thoracic Surgery",
+  "Transplant Surgery",
+  "Trauma Surgery",
+  "Urology",
+  "Vascular Neurology",
+  "Vascular Surgery",
+  "Adolescent Medicine",
+  "Aerospace Medicine",
+  "Biochemical Genetics",
+  "Chemical Pathology",
+  "Clinical Biochemistry",
+  "Clinical Cytogenetics",
+  "Clinical Immunology",
+  "Clinical Microbiology",
+  "Clinical Pathology",
+  "Clinical Psychology",
+  "Community Health",
+  "Dental Public Health",
+  "Developmental Pediatrics",
+  "Endodontics",
+  "Epidemiology",
+  "Forensic Medicine",
+  "Forensic Pathology",
+  "Gastrointestinal Surgery",
+  "General Internal Medicine",
+  "Geriatric Psychiatry",
+  "Health Informatics",
+  "Hematopathology",
+  "Hospice and Palliative Medicine",
+  "Immunopathology",
+  "Interventional Neuroradiology",
+  "Laboratory Medicine",
+  "Laparoscopic Surgery",
+  "Lifestyle Medicine",
+  "Maxillofacial Surgery",
+  "Medical Biochemistry",
+  "Medical Genetics",
+  "Medical Microbiology",
+  "Military Medicine",
+  "Molecular Pathology",
+  "Musculoskeletal Radiology",
+  "Neonatology",
+  "Neuroendocrinology",
+  "Neuroimaging",
+  "Neurointerventional Surgery",
+  "Neuropathology",
+  "Neuropsychiatry",
+  "Nuclear Cardiology",
+  "Occupational Health",
+  "Oncologic Surgery",
+  "Oral Medicine",
+  "Oral Pathology",
+  "Orthodontics",
+  "Orthopedic Oncology",
+  "Pain Rehabilitation",
+  "Pediatric Dentistry",
+  "Pediatric Emergency Care",
+  "Pediatric Gastrohepatic Surgery",
+  "Pediatric Infectious Medicine",
+  "Pediatric Intensive Care",
+  "Pediatric Neuroradiology",
+  "Pediatric Pathology",
+  "Pediatric Plastic Surgery",
+  "Pediatric Rehabilitation",
+  "Pediatric Thoracic Surgery",
+  "Perinatal Medicine",
+  "Phlebology",
+  "Physician Executive",
+  "Plastic and Reconstructive Surgery",
+  "Primary Care",
+  "Proctology",
+  "Pulmonology (Respiratory Medicine)",
+  "Radiologic Physics",
+  "Rehabilitation Psychology",
+  "Reproductive Medicine",
+  "Rural Medicine",
+  "Sleep Disorders Medicine",
+  "Spine Surgery",
+  "Surgical Oncology",
+  "Tropical Medicine",
+  "Undersea and Hyperbaric Medicine",
+  "Urgent Care Medicine",
+  "Urogynecology",
+  "Vascular and Interventional Radiology",
+  "Virology",
+  "Women's Health",
+  "Wound Care Medicine"
 ];
 
 const TREATMENTS = [
-  "Cupping Therapy", "Acupuncture", "Massage Therapy", "Herbal Treatment", 
-  "Physical Therapy", "Homeopathy"
+  "Cupping Therapy",
+  "Acupuncture",
+  "Massage Therapy",
+  "Herbal Treatment",
+  "Physical Therapy",
+  "Homeopathy",
 ];
 
 const CONDITIONS = [
-  "Back Pain", "Headache", "Arthritis", "Depression", "Anxiety", "Diabetes", 
-  "Hypertension", "Obesity"
+  "High Blood Pressure",
+  "Piles",
+  "Diarrhea",
+  "Acne",
+  "Pregnancy",
+  "Fever",
+  "Heart Attack",
+  "Hypertension",
+  "Low Blood Pressure",
+  "Chest Pain",
+  "Heart Failure",
+  "Arrhythmia",
+  "Stroke",
+  "Angina",
+  "Coronary Artery Disease",
+  "Peripheral Vascular Disease",
+  "Constipation",
+  "Acid Reflux / GERD",
+  "Irritable Bowel Syndrome",
+  "Peptic Ulcer",
+  "Liver Disease",
+  "Hepatitis",
+  "Jaundice",
+  "Hemorrhoids",
+  "Appendicitis",
+  "Gallstones",
+  "Nausea & Vomiting",
+  "Bloating",
+  "Asthma",
+  "Bronchitis",
+  "Pneumonia",
+  "Tuberculosis",
+  "Shortness of Breath",
+  "Cough",
+  "Sinusitis",
+  "Allergic Rhinitis",
+  "Sleep Apnea",
+  "Eczema",
+  "Psoriasis",
+  "Skin Allergy",
+  "Fungal Infection",
+  "Rash",
+  "Dandruff",
+  "Warts",
+  "Hair Loss",
+  "Vitiligo",
+  "Back Pain",
+  "Knee Pain",
+  "Arthritis",
+  "Joint Pain",
+  "Neck Pain",
+  "Gout",
+  "Osteoporosis",
+  "Fracture",
+  "Sciatica",
+  "Migraine",
+  "Headache",
+  "Epilepsy",
+  "Vertigo / Dizziness",
+  "Parkinson's Disease",
+  "Anxiety",
+  "Depression",
+  "Insomnia",
+  "Memory Loss",
+  "Diabetes",
+  "Diabetes Type 1",
+  "Diabetes Type 2",
+  "Thyroid Disorder",
+  "Hypothyroidism",
+  "Hyperthyroidism",
+  "PCOS",
+  "Obesity",
+  "High Cholesterol",
+  "Kidney Stones",
+  "Urinary Tract Infection",
+  "Kidney Disease",
+  "Prostate Problems",
+  "Incontinence",
+  "Eye Infection",
+  "Cataract",
+  "Glaucoma",
+  "Ear Infection",
+  "Tonsillitis",
+  "Hearing Loss",
+  "Nasal Polyps",
+  "Menstrual Disorders",
+  "Infertility",
+  "Menopause",
+  "Uterine Fibroids",
+  "Endometriosis",
+  "Growth Disorders",
+  "Childhood Asthma",
+  "Malnutrition",
+  "Developmental Delay",
+  "Toothache",
+  "Gum Disease",
+  "Tooth Decay",
+  "Mouth Ulcer",
+  "Anemia",
+  "Dehydration",
+  "Malaria",
+  "Dengue",
+  "Typhoid",
+  "COVID-19",
+  "Chickenpox",
+  "Weight Loss",
+  "Fatigue",
+  "Cupping Therapy",
+  "Acupuncture",
+  "Massage Therapy",
+  "Herbal Treatment",
+  "Physiotherapy",
+  "Chiropractic",
 ];
 
 export default function AddDoctorPage() {
@@ -58,6 +350,7 @@ export default function AddDoctorPage() {
     password: "",
     confirmPassword: ""
   });
+  const [errors, setErrors] = useState<Record<string, string>>({});
   const [passwordError, setPasswordError] = useState<string | null>(null);
 
   // --- State for Doctor Profile ---
@@ -164,21 +457,26 @@ export default function AddDoctorPage() {
   };
 
   const handleRegister = async () => {
+    setErrors({});
+    
     if (userFields.password !== userFields.confirmPassword) {
-      setPasswordError("Password and Confirm Password do not match.");
+      setErrors(prev => ({ ...prev, confirmPassword: "Passwords do not match" }));
       toast.error("Passwords do not match");
       return;
     }
-    setPasswordError(null);
 
-    // Basic validation
-    if (
-      !userFields.fullName.trim() ||
-      !userFields.email.trim() ||
-      !userFields.password.trim() ||
-      !doctorData.yearsOfExperience.trim()
-    ) {
-      toast.error("Please fill in all required fields (Name, Email, Password, Experience)");
+    // Comprehensive validation
+    const newErrors: Record<string, string> = {};
+    if (!userFields.fullName.trim()) newErrors.fullName = "Full Name is required";
+    if (!userFields.email.trim()) newErrors.email = "Email is required";
+    if (!userFields.city.trim()) newErrors.city = "City is required";
+    if (!userFields.password.trim()) newErrors.password = "Password is required";
+    if (!doctorData.yearsOfExperience.trim()) newErrors.yearsOfExperience = "Experience is required";
+    if (doctorData.primarySpecializations.length === 0) newErrors.primarySpecializations = "At least one specialization is required";
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      toast.error("Please fill in all required fields");
       return;
     }
 
@@ -270,8 +568,13 @@ export default function AddDoctorPage() {
                   <Input 
                     placeholder="Enter full name" 
                     value={userFields.fullName}
-                    onChange={(e) => setUserFields({ ...userFields, fullName: e.target.value })}
+                    onChange={(e) => {
+                      setUserFields({ ...userFields, fullName: e.target.value });
+                      if (errors.fullName) setErrors(prev => { const n = {...prev}; delete n.fullName; return n; });
+                    }}
+                    className={errors.fullName ? "border-red-500" : ""}
                   />
+                  {errors.fullName && <p className="text-xs text-red-500">{errors.fullName}</p>}
                 </div>
 
                 <div className="space-y-2">
@@ -301,10 +604,15 @@ export default function AddDoctorPage() {
                     ref={cityInputRef}
                     placeholder="Search city..."
                     value={userFields.city}
-                    onChange={(e) => handleCityInputChange(e.target.value)}
+                    onChange={(e) => {
+                      handleCityInputChange(e.target.value);
+                      if (errors.city) setErrors(prev => { const n = {...prev}; delete n.city; return n; });
+                    }}
                     onFocus={() => setIsCityFocused(true)}
                     onBlur={() => setTimeout(() => setIsCityFocused(false), 200)}
+                    className={errors.city ? "border-red-500" : ""}
                   />
+                  {errors.city && <p className="text-xs text-red-500">{errors.city}</p>}
                   {isCityFocused && citySuggestions.length > 0 && (
                     <div className="absolute top-full left-0 right-0 mt-1 bg-white border rounded-md shadow-lg z-50 max-h-[200px] overflow-y-auto">
                       {citySuggestions.map((suggestion) => (
@@ -326,17 +634,21 @@ export default function AddDoctorPage() {
                   <Label>Email <span className="text-red-500">*</span></Label>
                   <Input 
                     type="email" 
-                    placeholder="example@gmail.com"
+                    placeholder="doctor@example.com" 
                     value={userFields.email}
-                    onChange={(e) => setUserFields({ ...userFields, email: e.target.value })}
+                    onChange={(e) => {
+                      setUserFields({ ...userFields, email: e.target.value });
+                      if (errors.email) setErrors(prev => { const n = {...prev}; delete n.email; return n; });
+                    }}
+                    className={errors.email ? "border-red-500" : ""}
                   />
+                  {errors.email && <p className="text-xs text-red-500">{errors.email}</p>}
                 </div>
 
-                <div className="space-y-2">
-                  <Label>Phone Number <span className="text-red-500">*</span></Label>
+                <div className="space-y-2 text-primary">
+                  <Label>Phone Number</Label>
                   <Input 
-                    type="tel"
-                    placeholder="03001234567"
+                    placeholder="+92 300 1234567" 
                     value={userFields.phoneNumber}
                     onChange={(e) => setUserFields({ ...userFields, phoneNumber: e.target.value })}
                   />
@@ -345,19 +657,31 @@ export default function AddDoctorPage() {
                 <div className="space-y-2">
                   <Label>Password <span className="text-red-500">*</span></Label>
                   <Input 
-                    type="password"
+                    type="password" 
+                    placeholder="Min. 8 characters" 
                     value={userFields.password}
-                    onChange={(e) => setUserFields({ ...userFields, password: e.target.value })}
+                    onChange={(e) => {
+                      setUserFields({ ...userFields, password: e.target.value });
+                      if (errors.password) setErrors(prev => { const n = {...prev}; delete n.password; return n; });
+                    }}
+                    className={errors.password ? "border-red-500" : ""}
                   />
+                  {errors.password && <p className="text-xs text-red-500">{errors.password}</p>}
                 </div>
 
                 <div className="space-y-2">
                   <Label>Confirm Password <span className="text-red-500">*</span></Label>
                   <Input 
-                    type="password"
+                    type="password" 
+                    placeholder="Repeat password" 
                     value={userFields.confirmPassword}
-                    onChange={(e) => setUserFields({ ...userFields, confirmPassword: e.target.value })}
+                    onChange={(e) => {
+                      setUserFields({ ...userFields, confirmPassword: e.target.value });
+                      if (errors.confirmPassword) setErrors(prev => { const n = {...prev}; delete n.confirmPassword; return n; });
+                    }}
+                    className={errors.confirmPassword ? "border-red-500" : ""}
                   />
+                  {errors.confirmPassword && <p className="text-xs text-red-500">{errors.confirmPassword}</p>}
                 </div>
               </div>
               
@@ -409,27 +733,36 @@ export default function AddDoctorPage() {
                 <div className="space-y-2">
                   <Label>Years of Experience <span className="text-red-500">*</span></Label>
                   <Input 
-                    type="number"
+                    type="number" 
                     placeholder="e.g. 5" 
                     value={doctorData.yearsOfExperience}
-                    onChange={(e) => setDoctorData(prev => ({ ...prev, yearsOfExperience: e.target.value }))}
+                    onChange={(e) => {
+                      setDoctorData({ ...doctorData, yearsOfExperience: e.target.value });
+                      if (errors.yearsOfExperience) setErrors(prev => { const n = {...prev}; delete n.yearsOfExperience; return n; });
+                    }}
+                    className={errors.yearsOfExperience ? "border-red-500" : ""}
                   />
+                  {errors.yearsOfExperience && <p className="text-xs text-red-500">{errors.yearsOfExperience}</p>}
                 </div>
 
                 <div className="col-span-1 md:col-span-2 space-y-4">
                   <AutocompleteField
-                    label="Primary Specializations"
-                    placeholder="Start typing..."
-                    inputValue={specializationInput}
-                    setInputValue={setSpecializationInput}
-                    selectedItems={doctorData.primarySpecializations}
-                    allOptions={SPECIALIZATIONS}
-                    fieldName="primarySpecializations"
-                    dropdownOpen={openDropdown === "specialization"}
-                    setDropdownOpen={(open: boolean) => setOpenDropdown(open ? "specialization" : null)}
-                    addItem={addItem}
-                    removeItem={removeItem}
-                  />
+                  label="Primary Specializations"
+                  placeholder="Start typing..."
+                  fieldName="primarySpecializations"
+                  allOptions={SPECIALIZATIONS}
+                  selectedItems={doctorData.primarySpecializations}
+                  inputValue={specializationInput}
+                  setInputValue={setSpecializationInput}
+                  dropdownOpen={openDropdown === "specializations"}
+                  setDropdownOpen={(open) => setOpenDropdown(open ? "specializations" : null)}
+                  addItem={(f, v) => {
+                    addItem(f, v);
+                    if (errors.primarySpecializations) setErrors(prev => { const n = {...prev}; delete n.primarySpecializations; return n; });
+                  }}
+                  removeItem={removeItem}
+                  error={errors.primarySpecializations}
+                />
 
                   <AutocompleteField
                     label="Services / Treatments Offered"
@@ -441,8 +774,12 @@ export default function AddDoctorPage() {
                     fieldName="servicesTreatment"
                     dropdownOpen={openDropdown === "treatment"}
                     setDropdownOpen={(open: boolean) => setOpenDropdown(open ? "treatment" : null)}
-                    addItem={addItem}
+                    addItem={(f, v) => {
+                      addItem(f, v);
+                      if (errors.servicesTreatment) setErrors(prev => { const n = {...prev}; delete n.servicesTreatment; return n; });
+                    }}
                     removeItem={removeItem}
+                    error={errors.servicesTreatment}
                   />
 
                    <AutocompleteField
@@ -455,8 +792,12 @@ export default function AddDoctorPage() {
                     fieldName="conditionsTreatment"
                     dropdownOpen={openDropdown === "condition"}
                     setDropdownOpen={(open: boolean) => setOpenDropdown(open ? "condition" : null)}
-                    addItem={addItem}
+                    addItem={(f, v) => {
+                      addItem(f, v);
+                      if (errors.conditionsTreatment) setErrors(prev => { const n = {...prev}; delete n.conditionsTreatment; return n; });
+                    }}
                     removeItem={removeItem}
+                    error={errors.conditionsTreatment}
                   />
                 </div>
 
@@ -565,6 +906,7 @@ function AutocompleteField({
   setDropdownOpen,
   addItem,
   removeItem,
+  error,
 }: {
   label: string;
   placeholder: string;
@@ -577,18 +919,31 @@ function AutocompleteField({
   setDropdownOpen: (open: boolean) => void;
   addItem: (field: "primarySpecializations" | "servicesTreatment" | "conditionsTreatment", value: string) => void;
   removeItem: (field: "primarySpecializations" | "servicesTreatment" | "conditionsTreatment", value: string) => void;
+  error?: string;
 }) {
-  const inputRef = useRef<HTMLInputElement>(null);
-  const [highlightedIndex, setHighlightedIndex] = useState(-1);
+  const inputRef = useRef<HTMLInputElement | null>(null);
+  const [highlightedIndex, setHighlightedIndex] = useState<number>(-1);
+
+  const normalizedInput = inputValue.trim();
+  const [debouncedInput, setDebouncedInput] = useState(normalizedInput);
+  useEffect(() => {
+    const t = setTimeout(() => setDebouncedInput(normalizedInput.toLowerCase()), 150);
+    return () => clearTimeout(t);
+  }, [normalizedInput]);
+
+  const uniqueOptions = useMemo(() => Array.from(new Set(allOptions)), [allOptions]);
+  const loweredUniqueOptions = useMemo(() => uniqueOptions.map((o) => o.toLowerCase()), [uniqueOptions]);
 
   const filteredOptions = useMemo(() => {
-    const unique = Array.from(new Set(allOptions as string[]));
-    const lowerInput = inputValue.toLowerCase();
-    if (!inputValue) return unique.filter((o) => !selectedItems.includes(o)).slice(0, 8);
-    return unique.filter((o) => 
-      !selectedItems.includes(o) && o.toLowerCase().includes(lowerInput)
-    );
-  }, [inputValue, allOptions, selectedItems]);
+    if (!debouncedInput) return uniqueOptions.filter((o) => !selectedItems.includes(o)).slice(0, 8);
+    return uniqueOptions.filter((option, i) => !selectedItems.includes(option) && loweredUniqueOptions[i].includes(debouncedInput));
+  }, [debouncedInput, uniqueOptions, loweredUniqueOptions, selectedItems]);
+
+  const focusInput = () => {
+    requestAnimationFrame(() => {
+      inputRef.current?.focus();
+    });
+  };
 
   const onKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "ArrowDown") {
@@ -602,9 +957,13 @@ function AutocompleteField({
       e.preventDefault();
       if (highlightedIndex >= 0 && filteredOptions[highlightedIndex]) {
         addItem(fieldName, filteredOptions[highlightedIndex]);
-        setHighlightedIndex(-1);
-      } else if (inputValue.trim()) {
-        addItem(fieldName, inputValue.trim());
+        focusInput();
+      } else {
+        const value = inputValue.trim();
+        if (value) {
+          addItem(fieldName, value);
+          focusInput();
+        }
       }
     } else if (e.key === "Escape") {
       setDropdownOpen(false);
@@ -615,54 +974,85 @@ function AutocompleteField({
     <div className="space-y-2">
       <Label>{label}</Label>
       <div className="relative">
-        <div className="border rounded-md p-2 min-h-[3rem] flex flex-wrap gap-2 items-center bg-background focus-within:ring-1 focus-within:ring-ring">
+        <div
+          className={`flex flex-wrap gap-2 p-2 min-h-[40px] rounded-md border bg-background text-sm ring-offset-background focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 ${error ? "border-red-500" : "border-input"}`}
+        >
           {selectedItems.map((item) => (
-             <span key={item} className="flex items-center gap-1 bg-secondary text-secondary-foreground px-2 py-1 rounded text-sm">
-               {item}
-               <button type="button" onClick={() => removeItem(fieldName, item)} className="hover:bg-destructive/20 rounded-full p-0.5">
-                 <X className="w-3 h-3" />
-               </button>
-             </span>
+            <div
+              key={item}
+              className="flex items-center gap-1 bg-secondary text-secondary-foreground px-2 py-1 rounded-md text-sm"
+            >
+              <span>{item}</span>
+              <button
+                type="button"
+                onClick={() => removeItem(fieldName, item)}
+                className="ml-1 rounded-full outline-none hover:bg-muted p-0.5"
+              >
+                <X className="h-3 w-3" />
+              </button>
+            </div>
           ))}
+
           <input
             ref={inputRef}
             type="text"
-            className="flex-1 bg-transparent outline-none text-sm min-w-[120px]"
-            placeholder={selectedItems.length === 0 ? placeholder : ""}
+            placeholder={selectedItems.length === 0 ? placeholder : "Add more..."}
             value={inputValue}
             onChange={(e) => {
               setInputValue(e.target.value);
               setDropdownOpen(true);
               setHighlightedIndex(-1);
             }}
-            onFocus={() => setDropdownOpen(true)}
+            onFocus={() => {
+              setDropdownOpen(true);
+              setHighlightedIndex(-1);
+            }}
             onBlur={() => setTimeout(() => setDropdownOpen(false), 200)}
             onKeyDown={onKeyDown}
+            className="flex-1 min-w-[120px] bg-transparent outline-none placeholder:text-muted-foreground"
           />
         </div>
 
         {dropdownOpen && filteredOptions.length > 0 && (
-          <div className="absolute top-full left-0 right-0 mt-1 bg-popover border rounded-md shadow-md z-50 max-h-52 overflow-auto text-popover-foreground">
-             {filteredOptions.map((option, idx) => (
-                <button
-                  key={option}
-                  type="button"
-                  onMouseDown={(e) => {
-                     e.preventDefault(); // Prevent blurring the input field immediately
-                     addItem(fieldName, option);
-                     setTimeout(() => inputRef.current?.focus(), 0);
-                  }}
-                  onMouseEnter={() => setHighlightedIndex(idx)}
-                  className={`w-full text-left px-3 py-2 text-sm ${
-                    idx === highlightedIndex ? "bg-accent text-accent-foreground" : "hover:bg-accent/50"
-                  }`}
-                >
-                  {option}
-                </button>
-             ))}
+          <div
+            className="absolute top-full left-0 right-0 mt-1 border rounded-md bg-popover shadow-md z-[100] max-h-52 overflow-auto"
+          >
+            {filteredOptions.map((option, idx) => (
+              <button
+                key={option}
+                type="button"
+                onMouseDown={(e) => {
+                  e.preventDefault();
+                  addItem(fieldName, option);
+                  focusInput();
+                }}
+                onMouseEnter={() => setHighlightedIndex(idx)}
+                className={`w-full text-left px-3 py-2 text-sm transition-colors border-b last:border-b-0 ${
+                  idx === highlightedIndex ? "bg-accent text-accent-foreground" : "hover:bg-accent/50 text-popover-foreground"
+                }`}
+              >
+                {option}
+              </button>
+            ))}
           </div>
         )}
+
+        {inputValue && !allOptions.map((o) => o.toLowerCase()).includes(inputValue.trim().toLowerCase()) && (
+          <Button
+            type="button"
+            size="sm"
+            onMouseDown={(e) => {
+              e.preventDefault();
+              addItem(fieldName, inputValue);
+              focusInput();
+            }}
+            className="absolute right-2 top-2 h-7"
+          >
+            Add
+          </Button>
+        )}
       </div>
+      {error && <p className="text-xs text-red-500">{error}</p>}
     </div>
   );
 }

@@ -14,8 +14,195 @@ import { Separator } from "@/components/ui/separator";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Download, Filter, MoreHorizontal, Plus, Search, X, Trash } from "lucide-react";
 import Link from "next/link";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { getDoctors, deleteDoctor } from "@/lib/api/apis";
+
+const SPECIALIZATIONS = [
+  "Allergy and Immunology",
+  "Anesthesiology",
+  "Cardiology",
+  "Cardiothoracic Surgery",
+  "Cardiovascular Surgery",
+  "Clinical Neurophysiology",
+  "Clinical Pharmacology",
+  "Colon and Rectal Surgery",
+  "Community Medicine",
+  "Critical Care Medicine",
+  "Dental Surgery",
+  "Dermatology",
+  "Diagnostic Radiology",
+  "Emergency Medicine",
+  "Endocrinology, Diabetes & Metabolism",
+  "Family Medicine",
+  "Gastroenterology",
+  "General Practice",
+  "General Surgery",
+  "Genetics and Genomics",
+  "Geriatric Medicine",
+  "Gynecologic Oncology",
+  "Hand Surgery",
+  "Head and Neck Surgery",
+  "Hematology",
+  "Hepatology",
+  "Hospital Medicine",
+  "Infectious Disease",
+  "Internal Medicine",
+  "Interventional Cardiology",
+  "Interventional Radiology",
+  "Legal Medicine",
+  "Maternal and Fetal Medicine",
+  "Medical Oncology",
+  "Medical Toxicology",
+  "Neonatal-Perinatal Medicine",
+  "Nephrology",
+  "Neurocritical Care",
+  "Neurodevelopmental Disabilities",
+  "Nerve Doctor",
+  "Neurology",
+  "Neuromuscular Medicine",
+  "Neuroradiology",
+  "Neurosurgery",
+  "Nuclear Medicine",
+  "Obstetrics & Gynecology",
+  "Gynecology",
+  "Gynecologist",
+  "Occupational Medicine",
+  "Oncology",
+  "Ophthalmology",
+  "Optometry",
+  "Oral and Maxillofacial Surgery",
+  "Orthopedic Surgery",
+  "Otolaryngology (ENT)",
+  "Pain Medicine",
+  "Palliative Care",
+  "Pathology",
+  "Pediatric Allergy & Immunology",
+  "Pediatric Anesthesiology",
+  "Pediatric Cardiology",
+  "Pediatric Critical Care Medicine",
+  "Pediatric Dermatology",
+  "Pediatric Emergency Medicine",
+  "Pediatric Endocrinology",
+  "Pediatric Gastroenterology",
+  "Pediatric Hematology & Oncology",
+  "Pediatric Infectious Diseases",
+  "Pediatric Nephrology",
+  "Pediatric Neurology",
+  "Pediatric Neurosurgery",
+  "Pediatric Oncology",
+  "Pediatric Ophthalmology",
+  "Pediatric Orthopedics",
+  "Pediatric Otolaryngology",
+  "Pediatric Pathology",
+  "Pediatric Pulmonology",
+  "Pediatric Radiology",
+  "Pediatric Rheumatology",
+  "Pediatric Surgery",
+  "Pediatric Urology",
+  "Pediatrics",
+  "Physical Medicine & Rehabilitation",
+  "Plastic Surgery",
+  "Preventive Medicine",
+  "Psychiatry",
+  "Psychosomatic Medicine",
+  "Public Health",
+  "Pulmonary Disease",
+  "Radiation Oncology",
+  "Radiology",
+  "Reproductive Endocrinology and Infertility",
+  "Rheumatology",
+  "Sleep Medicine",
+  "Spinal Cord Injury Medicine",
+  "Sports Medicine",
+  "Surgical Critical Care",
+  "Thoracic Surgery",
+  "Transplant Surgery",
+  "Trauma Surgery",
+  "Urology",
+  "Vascular Neurology",
+  "Vascular Surgery",
+  "Adolescent Medicine",
+  "Aerospace Medicine",
+  "Biochemical Genetics",
+  "Chemical Pathology",
+  "Clinical Biochemistry",
+  "Clinical Cytogenetics",
+  "Clinical Immunology",
+  "Clinical Microbiology",
+  "Clinical Pathology",
+  "Clinical Psychology",
+  "Community Health",
+  "Dental Public Health",
+  "Developmental Pediatrics",
+  "Endodontics",
+  "Epidemiology",
+  "Forensic Medicine",
+  "Forensic Pathology",
+  "Gastrointestinal Surgery",
+  "General Internal Medicine",
+  "Geriatric Psychiatry",
+  "Health Informatics",
+  "Hematopathology",
+  "Hospice and Palliative Medicine",
+  "Immunopathology",
+  "Interventional Neuroradiology",
+  "Laboratory Medicine",
+  "Laparoscopic Surgery",
+  "Lifestyle Medicine",
+  "Maxillofacial Surgery",
+  "Medical Biochemistry",
+  "Medical Genetics",
+  "Medical Microbiology",
+  "Military Medicine",
+  "Molecular Pathology",
+  "Musculoskeletal Radiology",
+  "Neonatology",
+  "Neuroendocrinology",
+  "Neuroimaging",
+  "Neurointerventional Surgery",
+  "Neuropathology",
+  "Neuropsychiatry",
+  "Nuclear Cardiology",
+  "Occupational Health",
+  "Oncologic Surgery",
+  "Oral Medicine",
+  "Oral Pathology",
+  "Orthodontics",
+  "Orthopedic Oncology",
+  "Pain Rehabilitation",
+  "Pediatric Dentistry",
+  "Pediatric Emergency Care",
+  "Pediatric Gastrohepatic Surgery",
+  "Pediatric Infectious Medicine",
+  "Pediatric Intensive Care",
+  "Pediatric Neuroradiology",
+  "Pediatric Pathology",
+  "Pediatric Plastic Surgery",
+  "Pediatric Rehabilitation",
+  "Pediatric Thoracic Surgery",
+  "Perinatal Medicine",
+  "Phlebology",
+  "Physician Executive",
+  "Plastic and Reconstructive Surgery",
+  "Primary Care",
+  "Proctology",
+  "Pulmonology (Respiratory Medicine)",
+  "Radiologic Physics",
+  "Rehabilitation Psychology",
+  "Reproductive Medicine",
+  "Rural Medicine",
+  "Sleep Disorders Medicine",
+  "Spine Surgery",
+  "Surgical Oncology",
+  "Tropical Medicine",
+  "Undersea and Hyperbaric Medicine",
+  "Urgent Care Medicine",
+  "Urogynecology",
+  "Vascular and Interventional Radiology",
+  "Virology",
+  "Women's Health",
+  "Wound Care Medicine"
+];
 
 export default function DoctorsPage() {
   const [doctors, setDoctors] = useState<any[]>([]);
@@ -29,6 +216,10 @@ export default function DoctorsPage() {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [activeFilters, setActiveFilters] = useState(0);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+
+  // Specialties Autocomplete State
+  const [specializationInput, setSpecializationInput] = useState("");
+  const [isSpecializationOpen, setIsSpecializationOpen] = useState(false);
 
   // Added delete handler
   const handleDelete = async (id: number) => {
@@ -90,6 +281,17 @@ export default function DoctorsPage() {
     setSelectedSpecialties((prev) => (prev.includes(specialty) ? prev.filter((s) => s !== specialty) : [...prev, specialty]));
   };
 
+  const removeSpecialty = (field: any, value: string) => {
+    setSelectedSpecialties((prev) => prev.filter((s) => s !== value));
+  };
+
+  const addSpecialty = (field: any, value: string) => {
+    if (!selectedSpecialties.includes(value)) {
+      setSelectedSpecialties((prev) => [...prev, value]);
+    }
+    setSpecializationInput("");
+  };
+
   // Toggle status filter
   const toggleStatus = (status: string) => {
     setSelectedStatuses((prev) => (prev.includes(status) ? prev.filter((s) => s !== status) : [...prev, status]));
@@ -117,12 +319,12 @@ export default function DoctorsPage() {
             <h2 className="text-2xl lg:text-3xl font-bold tracking-tight mb-2">Doctors</h2>
             <p className="text-muted-foreground">Manage your medical staff and their information.</p>
           </div>
-          <Button asChild>
+          {/* <Button asChild>
             <Link href="/doctors/add">
               <Plus className="mr-2 h-4 w-4" />
               Add Doctor
             </Link>
-          </Button>
+          </Button> */}
         </div>
 
         <Card>
@@ -155,17 +357,19 @@ export default function DoctorsPage() {
                   </div>
                   <div className="p-4 space-y-4">
                     <div className="space-y-2">
-                      <h5 className="text-sm font-medium">Specialty</h5>
-                      <div className="grid grid-cols-1 gap-2">
-                        {uniqueSpecialties.map((specialty: any) => (
-                          <div key={specialty} className="flex items-center space-x-2">
-                            <Checkbox id={`specialty-${specialty}`} checked={selectedSpecialties.includes(specialty)} onCheckedChange={() => toggleSpecialty(specialty)} />
-                            <Label htmlFor={`specialty-${specialty}`} className="text-sm font-normal">
-                              {specialty}
-                            </Label>
-                          </div>
-                        ))}
-                      </div>
+                      <AutocompleteField
+                        label="Specialty"
+                        placeholder="Search specialty..."
+                        inputValue={specializationInput}
+                        setInputValue={setSpecializationInput}
+                        selectedItems={selectedSpecialties}
+                        allOptions={SPECIALIZATIONS}
+                        fieldName="primarySpecializations"
+                        dropdownOpen={isSpecializationOpen}
+                        setDropdownOpen={setIsSpecializationOpen}
+                        addItem={addSpecialty}
+                        removeItem={removeSpecialty}
+                      />
                     </div>
                     <Separator />
                     <div className="space-y-2">
@@ -319,5 +523,167 @@ export default function DoctorsPage() {
         </AlertDialogContent>
       </AlertDialog>
     </>
+  );
+}
+function AutocompleteField({
+  label,
+  placeholder,
+  inputValue,
+  setInputValue,
+  selectedItems,
+  allOptions,
+  fieldName,
+  dropdownOpen,
+  setDropdownOpen,
+  addItem,
+  removeItem,
+  error,
+}: {
+  label: string;
+  placeholder: string;
+  inputValue: string;
+  setInputValue: (value: string) => void;
+  selectedItems: string[];
+  allOptions: string[];
+  fieldName: any;
+  dropdownOpen: boolean;
+  setDropdownOpen: (open: boolean) => void;
+  addItem: (field: any, value: string) => void;
+  removeItem: (field: any, value: string) => void;
+  error?: string;
+}) {
+  const inputRef = useRef<HTMLInputElement | null>(null);
+  const [highlightedIndex, setHighlightedIndex] = useState<number>(-1);
+
+  const normalizedInput = inputValue.trim();
+  const [debouncedInput, setDebouncedInput] = useState(normalizedInput);
+  useEffect(() => {
+    const t = setTimeout(() => setDebouncedInput(normalizedInput.toLowerCase()), 150);
+    return () => clearTimeout(t);
+  }, [normalizedInput]);
+
+  const uniqueOptions = useMemo(() => Array.from(new Set(allOptions)), [allOptions]);
+  const loweredUniqueOptions = useMemo(() => uniqueOptions.map((o) => o.toLowerCase()), [uniqueOptions]);
+
+  const filteredOptions = useMemo(() => {
+    if (!debouncedInput) return uniqueOptions.filter((o) => !selectedItems.includes(o)).slice(0, 8);
+    return uniqueOptions.filter((option, i) => !selectedItems.includes(option) && loweredUniqueOptions[i].includes(debouncedInput));
+  }, [debouncedInput, uniqueOptions, loweredUniqueOptions, selectedItems]);
+
+  const focusInput = () => {
+    requestAnimationFrame(() => {
+      inputRef.current?.focus();
+    });
+  };
+
+  const onKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      setHighlightedIndex((prev) => Math.min(prev + 1, filteredOptions.length - 1));
+      setDropdownOpen(true);
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      setHighlightedIndex((prev) => Math.max(prev - 1, 0));
+    } else if (e.key === "Enter") {
+      e.preventDefault();
+      if (highlightedIndex >= 0 && filteredOptions[highlightedIndex]) {
+        addItem(fieldName, filteredOptions[highlightedIndex]);
+        focusInput();
+      } else {
+        const value = inputValue.trim();
+        if (value) {
+          addItem(fieldName, value);
+          focusInput();
+        }
+      }
+    } else if (e.key === "Escape") {
+      setDropdownOpen(false);
+    }
+  };
+
+  return (
+    <div className="space-y-2">
+      <Label className="text-sm font-medium">{label}</Label>
+      <div className="relative">
+        <div
+          className={`flex flex-wrap gap-1 p-2 min-h-[40px] rounded-md border bg-background text-sm ring-offset-background focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 ${error ? "border-red-500" : "border-input"}`}
+        >
+          {selectedItems.map((item) => (
+            <div
+              key={item}
+              className="flex items-center gap-1 bg-secondary text-secondary-foreground px-2 py-0.5 rounded-md text-xs"
+            >
+              <span>{item}</span>
+              <button
+                type="button"
+                onClick={() => removeItem(fieldName, item)}
+                className="ml-1 rounded-full outline-none hover:bg-muted p-0.5"
+              >
+                <X className="h-3 w-3" />
+              </button>
+            </div>
+          ))}
+
+          <input
+            ref={inputRef}
+            type="text"
+            placeholder={selectedItems.length === 0 ? placeholder : "Add more..."}
+            value={inputValue}
+            onChange={(e) => {
+              setInputValue(e.target.value);
+              setDropdownOpen(true);
+              setHighlightedIndex(-1);
+            }}
+            onFocus={() => {
+              setDropdownOpen(true);
+              setHighlightedIndex(-1);
+            }}
+            onBlur={() => setTimeout(() => setDropdownOpen(false), 200)}
+            onKeyDown={onKeyDown}
+            className="flex-1 min-w-[80px] bg-transparent outline-none placeholder:text-muted-foreground text-xs"
+          />
+        </div>
+
+        {dropdownOpen && filteredOptions.length > 0 && (
+          <div
+            className="absolute top-full left-0 right-0 mt-1 border rounded-md bg-popover shadow-md z-[100] max-h-40 overflow-auto"
+          >
+            {filteredOptions.map((option, idx) => (
+              <button
+                key={option}
+                type="button"
+                onMouseDown={(e) => {
+                  e.preventDefault();
+                  addItem(fieldName, option);
+                  focusInput();
+                }}
+                onMouseEnter={() => setHighlightedIndex(idx)}
+                className={`w-full text-left px-3 py-1.5 text-xs transition-colors border-b last:border-b-0 ${
+                  idx === highlightedIndex ? "bg-accent text-accent-foreground" : "hover:bg-accent/50 text-popover-foreground"
+                }`}
+              >
+                {option}
+              </button>
+            ))}
+          </div>
+        )}
+
+        {inputValue && !allOptions.map((o) => o.toLowerCase()).includes(inputValue.trim().toLowerCase()) && (
+          <Button
+            type="button"
+            size="sm"
+            onMouseDown={(e) => {
+              e.preventDefault();
+              addItem(fieldName, inputValue);
+              focusInput();
+            }}
+            className="absolute right-2 top-2 h-6 text-[10px] px-2"
+          >
+            Add
+          </Button>
+        )}
+      </div>
+      {error && <p className="text-xs text-red-500">{error}</p>}
+    </div>
   );
 }
