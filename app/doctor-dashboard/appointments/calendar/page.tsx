@@ -26,6 +26,8 @@ interface ApiAppointment {
   notes: string;
   appointmentDate: string;
   appointmentTime: string;
+  time?: string;
+  startTime?: string;
   appointmentFor: string;
   userId: number;
   doctorId: number;
@@ -95,7 +97,9 @@ const calculateEndTime = (startTime: string, durationMinutes: number = 30): stri
 };
 
 // Transform API response to Calendar format
-const transformAppointment = (apiData: ApiAppointment): CalendarAppointment => {
+const transformAppointment = (apiData: ApiAppointment): CalendarAppointment | null => {
+  if (!apiData.appointmentDate) return null;
+
   const formatStatus = (status: string): string => {
     if (!status) return "Pending";
     return status.charAt(0).toUpperCase() + status.slice(1).toLowerCase();
@@ -103,32 +107,33 @@ const transformAppointment = (apiData: ApiAppointment): CalendarAppointment => {
 
   const formatType = (type: string | null): string => {
     if (!type) return "Consultation";
-    switch (type.toLowerCase()) {
-      case "inclinic":
-        return "In-Clinic";
-      case "online":
-        return "Online";
-      case "video":
-        return "Video Call";
-      default:
-        return type.charAt(0).toUpperCase() + type.slice(1);
-    }
+    const t = type.toLowerCase();
+    if (t === "inclinic") return "In-Clinic";
+    if (t === "online") return "Online";
+    if (t === "video") return "Video Call";
+    return type.charAt(0).toUpperCase() + type.slice(1);
   };
 
   const status = formatStatus(apiData.status);
-  const appointmentDate = new Date(apiData.appointmentDate);
-  appointmentDate.setHours(0, 0, 0, 0);
+  
+  // Create a clean date object
+  const dateObj = new Date(apiData.appointmentDate);
+  if (isNaN(dateObj.getTime())) return null;
+  
+  const appointmentDate = new Date(dateObj.getFullYear(), dateObj.getMonth(), dateObj.getDate());
+
+  const appTime = apiData.appointmentTime || apiData.time || "";
 
   return {
-    id: apiData.id?.toString(),
+    id: (apiData.id || Math.random()).toString(),
     patient: {
       name: apiData.patientName || apiData.name || apiData.patient?.name || "Unknown Patient",
       image: apiData.profilepicture || apiData.patient?.profilePic || "",
     },
     doctor: "Doctor",
     date: appointmentDate,
-    time: apiData.appointmentTime || "",
-    endTime: apiData.appointmentTime ? calculateEndTime(apiData.appointmentTime, 30) : "",
+    time: appTime,
+    endTime: appTime ? calculateEndTime(appTime, 30) : "",
     status: status,
     type: formatType(apiData.appointmentType),
     duration: 30,
@@ -192,7 +197,9 @@ export default function CalendarPage() {
         setError(null);
         const response = await getAppointmentsForDoctor();
         const arr = Array.isArray(response) ? response : (Array.isArray(response?.upcomingAppointments) ? response.upcomingAppointments : (Array.isArray(response?.appointments) ? response.appointments : []));
-        const transformedData = arr.map((apt: ApiAppointment) => transformAppointment(apt));
+        const transformedData = arr
+          .map((apt: ApiAppointment) => transformAppointment(apt))
+          .filter((apt: CalendarAppointment | null): apt is CalendarAppointment => apt !== null);
         setAppointments(transformedData);
       } catch (err) {
         console.error("Failed to fetch appointments:", err);
@@ -315,9 +322,20 @@ export default function CalendarPage() {
               </div>
               <div className="flex-1 p-1 md:p-2 min-h-[80px]">
                 {appointmentsForDay
-                  .filter((appointment) => appointment.time.includes(timeSlot.split(":")[0]))
+                  .filter((appointment) => {
+                    const appHour = parseInt(appointment.time.split(":")[0]);
+                    const slotHour = parseInt(timeSlot.split(":")[0]);
+                    const appPeriod = appointment.time.toLowerCase().includes("pm") ? "pm" : "am";
+                    const slotPeriod = timeSlot.toLowerCase().includes("pm") ? "pm" : "am";
+                    
+                    // Basic hour match with AM/PM consideration
+                    if (appHour === 12 && appPeriod === "pm") return slotHour === 12 && slotPeriod === "pm";
+                    if (appHour === 12 && appPeriod === "am") return slotHour === 12 && slotPeriod === "am";
+                    
+                    return appHour === slotHour && appPeriod === slotPeriod;
+                  })
                   .map((appointment) => (
-                    <div key={appointment.id} className={`p-2 mb-1 rounded-md bg-${appointment.color}-500/10 border border-${appointment.color}-300`}>
+                    <div key={appointment.id} className={`p-2 mb-1 rounded-md bg-${appointment.color}-500/10 border border-${appointment.color}-300 shadow-sm`}>
                       <div className="flex items-center justify-between">
                         <div className="flex items-center">
                           <Avatar className="h-6 w-6 mr-2">

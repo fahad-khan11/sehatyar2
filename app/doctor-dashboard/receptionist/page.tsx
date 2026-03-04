@@ -72,7 +72,6 @@ export default function ReceptionistPage() {
         setIsLoading(true);
         setError(null);
         const data: DoctorProfileResponse = await getReceptionists();
-        // Extract receptionist from the response
         setReceptionist(data?.receptionist || null);
       } catch (err) {
         console.error("Failed to fetch receptionist:", err);
@@ -98,7 +97,6 @@ export default function ReceptionistPage() {
     e.preventDefault();
     setFormError(null);
 
-    // Basic validation
     if (!formData.fullName.trim()) {
       setFormError("Full name is required");
       return;
@@ -119,12 +117,8 @@ export default function ReceptionistPage() {
     try {
       setIsSubmitting(true);
       await addReceptionist(formData);
-      
-      // Refresh receptionist data
       const data: DoctorProfileResponse = await getReceptionists();
       setReceptionist(data?.receptionist || null);
-      
-      // Reset form and close dialog
       setFormData({
         fullName: "",
         gender: "male",
@@ -144,7 +138,6 @@ export default function ReceptionistPage() {
     }
   };
 
-  // Format date
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString("en-US", {
       year: "numeric",
@@ -153,102 +146,66 @@ export default function ReceptionistPage() {
     });
   };
 
-  // Loading state
   if (isLoading) {
     return (
-      <div className="container mx-auto py-6 flex items-center justify-center min-h-[400px]">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      <div className="container mx-auto py-12 flex items-center justify-center">
+        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
       </div>
     );
   }
 
   return (
-    <div className="container mx-auto py-6 space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl lg:text-3xl font-bold">Receptionist</h1>
-          <p className="text-muted-foreground">
-            {receptionist ? "Manage your receptionist" : "Add a receptionist to help manage your appointments"}
-          </p>
-        </div>
-        
-        {/* Only show Add button if no receptionist exists */}
+    <div className="container mx-auto py-8 space-y-6">
+      {/* Header - Compact & Single Line */}
+      <div className="flex flex-col items-center justify-center text-center space-y-1">
+       
         {!receptionist && (
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>
-              <Button>
+              <Button size="sm" className="rounded-full px-6 border-2 border-foreground bg-foreground text-background hover:bg-background hover:text-foreground transition-all font-semibold mt-2">
                 <UserPlus className="mr-2 h-4 w-4" />
                 Add Receptionist
               </Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[500px]">
+            <DialogContent className="sm:max-w-[500px] border-border shadow-2xl">
               <DialogHeader>
-                <DialogTitle className="flex items-center gap-2">
-                  <UserPlus className="h-5 w-5 text-primary" />
+                <DialogTitle className="flex items-center gap-2 text-xl font-bold">
                   Add Receptionist
                 </DialogTitle>
-                <DialogDescription>
-                  Enter the details for your receptionist. They will be able to manage appointments on your behalf.
+                <DialogDescription className="text-muted-foreground">
+                  Credentials provided here will be used by your staff to access the dashboard.
                 </DialogDescription>
               </DialogHeader>
-              <form onSubmit={handleSubmit}>
+              <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="grid gap-4 py-4">
                   {formError && (
-                    <div className="bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 p-3 rounded-lg text-sm">
+                    <div className="bg-destructive/10 text-destructive p-3 rounded-md text-sm font-medium border border-destructive/20 text-center">
                       {formError}
                     </div>
                   )}
                   
                   <div className="grid gap-2">
-                    <Label htmlFor="fullName">Full Name *</Label>
-                    <Input
-                      id="fullName"
-                      name="fullName"
-                      value={formData.fullName}
-                      onChange={handleInputChange}
-                      placeholder="Enter full name"
-                    />
+                    <Label htmlFor="fullName" className="text-sm font-semibold">Full Name *</Label>
+                    <Input id="fullName" name="fullName" value={formData.fullName} onChange={handleInputChange} placeholder="Staff member's full name" className="rounded-xl border-border" />
                   </div>
 
                   <div className="grid grid-cols-2 gap-4">
                     <div className="grid gap-2">
-                      <Label htmlFor="email">Email *</Label>
-                      <Input
-                        id="email"
-                        name="email"
-                        type="email"
-                        value={formData.email}
-                        onChange={handleInputChange}
-                        placeholder="email@example.com"
-                      />
+                      <Label htmlFor="email" className="text-sm font-semibold">Email *</Label>
+                      <Input id="email" name="email" type="email" value={formData.email} onChange={handleInputChange} placeholder="staff@clinic.com" className="rounded-xl" />
                     </div>
                     <div className="grid gap-2">
-                      <Label htmlFor="phoneNumber">Phone Number *</Label>
-                      <Input
-                        id="phoneNumber"
-                        name="phoneNumber"
-                        type="tel"
-                        value={formData.phoneNumber}
-                        onChange={handleInputChange}
-                        placeholder="+92 300 1234567"
-                      />
+                      <Label htmlFor="phoneNumber" className="text-sm font-semibold">Phone *</Label>
+                      <Input id="phoneNumber" name="phoneNumber" type="tel" value={formData.phoneNumber} onChange={handleInputChange} placeholder="Contact number" className="rounded-xl" />
                     </div>
                   </div>
 
                   <div className="grid grid-cols-2 gap-4">
                     <div className="grid gap-2">
-                      <Label htmlFor="gender">Gender</Label>
-                      <Select
-                        value={formData.gender}
-                        onValueChange={(value: "male" | "female" | "other") =>
-                          setFormData(prev => ({ ...prev, gender: value }))
-                        }
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select gender" />
-                        </SelectTrigger>
-                        <SelectContent>
+                      <Label htmlFor="gender" className="text-sm font-semibold">Gender</Label>
+                      <Select value={formData.gender} onValueChange={(value: "male" | "female" | "other") => setFormData(prev => ({ ...prev, gender: value }))}>
+                        <SelectTrigger className="rounded-xl"><SelectValue placeholder="Select" /></SelectTrigger>
+                        <SelectContent className="rounded-xl">
                           <SelectItem value="male">Male</SelectItem>
                           <SelectItem value="female">Female</SelectItem>
                           <SelectItem value="other">Other</SelectItem>
@@ -256,57 +213,26 @@ export default function ReceptionistPage() {
                       </Select>
                     </div>
                     <div className="grid gap-2">
-                      <Label htmlFor="password">Password *</Label>
-                      <Input
-                        id="password"
-                        name="password"
-                        type="password"
-                        value={formData.password}
-                        onChange={handleInputChange}
-                        placeholder="Min 6 characters"
-                      />
+                      <Label htmlFor="password" className="text-sm font-semibold">Password *</Label>
+                      <Input id="password" name="password" type="password" value={formData.password} onChange={handleInputChange} placeholder="Security code" className="rounded-xl" />
                     </div>
                   </div>
 
                   <div className="grid grid-cols-2 gap-4">
                     <div className="grid gap-2">
-                      <Label htmlFor="country">Country</Label>
-                      <Input
-                        id="country"
-                        name="country"
-                        value={formData.country}
-                        onChange={handleInputChange}
-                        placeholder="Country"
-                      />
+                      <Label htmlFor="country" className="text-sm font-semibold">Country</Label>
+                      <Input id="country" name="country" value={formData.country} onChange={handleInputChange} placeholder="e.g. Pakistan" className="rounded-xl" />
                     </div>
                     <div className="grid gap-2">
-                      <Label htmlFor="city">City</Label>
-                      <Input
-                        id="city"
-                        name="city"
-                        value={formData.city}
-                        onChange={handleInputChange}
-                        placeholder="City"
-                      />
+                      <Label htmlFor="city" className="text-sm font-semibold">City</Label>
+                      <Input id="city" name="city" value={formData.city} onChange={handleInputChange} placeholder="e.g. Faisalabad" className="rounded-xl" />
                     </div>
                   </div>
                 </div>
-                <DialogFooter>
-                  <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
-                    Cancel
-                  </Button>
-                  <Button type="submit" disabled={isSubmitting}>
-                    {isSubmitting ? (
-                      <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        Adding...
-                      </>
-                    ) : (
-                      <>
-                        <Plus className="mr-2 h-4 w-4" />
-                        Add Receptionist
-                      </>
-                    )}
+                <DialogFooter className="gap-2 sm:gap-0">
+                  <Button type="button" variant="ghost" onClick={() => setIsDialogOpen(false)} className="rounded-xl">Cancel</Button>
+                  <Button type="submit" disabled={isSubmitting} className="rounded-xl px-8 bg-foreground text-background hover:opacity-90">
+                    {isSubmitting ? <Loader2 className="h-4 w-4 animate-spin" /> : "Verify & Add"}
                   </Button>
                 </DialogFooter>
               </form>
@@ -315,122 +241,85 @@ export default function ReceptionistPage() {
         )}
       </div>
 
-      {/* Error State */}
-      {error && (
-        <Card className="border-red-200 bg-red-50 dark:bg-red-900/20">
-          <CardContent className="py-6 text-center">
-            <p className="text-red-600 dark:text-red-400">{error}</p>
-            <Button variant="outline" className="mt-4" onClick={() => window.location.reload()}>
-              Try Again
-            </Button>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* No Receptionist State */}
-      {!error && !receptionist && (
-        <Card>
-          <CardContent className="py-12 text-center">
-            <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-primary/10 flex items-center justify-center">
-              <User className="h-8 w-8 text-primary" />
+      {/* Main Content Area */}
+      <div className="max-w-2xl mx-auto">
+        {/* No Receptionist State - Compact */}
+        {!error && !receptionist && (
+          <div className="text-center py-12 px-6 rounded-3xl border border-dashed border-border bg-muted/10">
+            <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-background border border-border flex items-center justify-center">
+              <User className="h-8 w-8 text-muted-foreground" />
             </div>
-            <h3 className="text-xl font-semibold mb-2">No Receptionist Added</h3>
-            <p className="text-muted-foreground mb-6 max-w-md mx-auto">
-              Add a receptionist to help manage your appointments, patient bookings, and schedule.
+            <h3 className="text-xl font-bold mb-2">Initialize Staff Portal</h3>
+            <p className="text-muted-foreground mb-6 max-w-sm mx-auto text-sm leading-relaxed">
+              Experience efficient clinic management by adding your first receptionist member today.
             </p>
-            <Button onClick={() => setIsDialogOpen(true)}>
-              <UserPlus className="mr-2 h-4 w-4" />
+            <Button onClick={() => setIsDialogOpen(true)} className="rounded-full px-8 bg-foreground text-background font-bold shadow hover:opacity-90 transition-all">
               Add Receptionist
             </Button>
-          </CardContent>
-        </Card>
-      )}
+          </div>
+        )}
 
-      {/* Receptionist Card */}
-      {!error && receptionist && (
-        <Card className="max-w-2xl">
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <CardTitle className="flex items-center gap-2">
-                <CheckCircle2 className="h-5 w-5 text-green-500" />
-                Your Receptionist
-              </CardTitle>
-              <Badge className={receptionist.isActive ? "bg-green-500" : "bg-gray-500"}>
-                {receptionist.isActive ? "Active" : "Inactive"}
-              </Badge>
-            </div>
-            <CardDescription>
-              Managing appointments on your behalf
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            {/* Profile Section */}
-            <div className="flex items-center gap-4">
-              <Avatar className="h-20 w-20">
-                <AvatarFallback className="text-2xl bg-primary/10 text-primary">
-                  {receptionist.fullName.charAt(0)}
-                </AvatarFallback>
-              </Avatar>
-              <div>
-                <h3 className="text-xl font-semibold">{receptionist.fullName}</h3>
-                <div className="flex items-center gap-2 mt-1">
-                  <Badge variant="outline" className="capitalize">{receptionist.gender}</Badge>
-                  {receptionist.isOnline && (
-                    <Badge className="bg-green-100 text-green-700">
-                      <span className="w-2 h-2 bg-green-500 rounded-full mr-1 inline-block"></span>
-                      Online
-                    </Badge>
-                  )}
+        {/* Receptionist Card - Compact Monochrome */}
+        {!error && receptionist && (
+          <div className="rounded-3xl border border-border bg-card overflow-hidden shadow-sm">
+            <div className="bg-muted/50 p-6 flex items-center gap-6 border-b border-border">
+              <div className="relative">
+                <Avatar className="h-20 w-20 border-2 border-background shadow-sm">
+                  <AvatarFallback className="text-2xl bg-foreground text-background font-black">
+                    {receptionist.fullName.charAt(0)}
+                  </AvatarFallback>
+                </Avatar>
+                {receptionist.isOnline && (
+                  <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-background rounded-full flex items-center justify-center border-2 border-background">
+                    <div className="w-2.5 h-2.5 bg-foreground rounded-full animate-pulse" />
+                  </div>
+                )}
+              </div>
+              <div className="space-y-1">
+                <h3 className="text-2xl font-black tracking-tighter uppercase">{receptionist.fullName}</h3>
+                <div className="flex items-center gap-2">
+                  <Badge variant="outline" className="rounded-full px-3 py-0 border-foreground text-[10px] font-bold uppercase tracking-wider bg-background">
+                    Authorized
+                  </Badge>
+                  <Badge className="rounded-full px-3 py-0 bg-foreground text-background text-[10px] font-bold uppercase tracking-wider">
+                    {receptionist.gender}
+                  </Badge>
                 </div>
               </div>
             </div>
 
-            <Separator />
+            <div className="p-6 space-y-6 bg-background">
+              {/* Data Grid - 2x2 Clean */}
+              <div className="grid grid-cols-2 gap-px bg-border/30 rounded-2xl overflow-hidden border border-border/30">
+                <div className="p-4 bg-background flex flex-col space-y-1 hover:bg-muted/10 transition-colors">
+                  <span className="text-[9px] uppercase font-black tracking-widest text-muted-foreground">Email Contact</span>
+                  <span className="text-sm font-medium truncate">{receptionist.email}</span>
+                </div>
+                <div className="p-4 bg-background flex flex-col space-y-1 hover:bg-muted/10 transition-colors">
+                  <span className="text-[9px] uppercase font-black tracking-widest text-muted-foreground">Phone Number</span>
+                  <span className="text-sm font-medium">{receptionist.phoneNumber || "---"}</span>
+                </div>
+                <div className="p-4 bg-background flex flex-col space-y-1 hover:bg-muted/10 transition-colors">
+                  <span className="text-[9px] uppercase font-black tracking-widest text-muted-foreground">Location</span>
+                  <span className="text-sm font-medium">{receptionist.city || "Clinic"}, {receptionist.country || ""}</span>
+                </div>
+                <div className="p-4 bg-background flex flex-col space-y-1 hover:bg-muted/10 transition-colors">
+                  <span className="text-[9px] uppercase font-black tracking-widest text-muted-foreground">Joined Since</span>
+                  <span className="text-sm font-medium">{formatDate(receptionist.createdAt)}</span>
+                </div>
+              </div>
 
-            {/* Contact Information */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="flex items-start gap-3 p-3 bg-muted/50 rounded-lg">
-                <Mail className="h-5 w-5 text-primary mt-0.5" />
-                <div>
-                  <p className="text-sm text-muted-foreground">Email</p>
-                  <p className="font-medium">{receptionist.email}</p>
-                </div>
-              </div>
-              <div className="flex items-start gap-3 p-3 bg-muted/50 rounded-lg">
-                <Phone className="h-5 w-5 text-primary mt-0.5" />
-                <div>
-                  <p className="text-sm text-muted-foreground">Phone</p>
-                  <p className="font-medium">{receptionist.phoneNumber}</p>
-                </div>
-              </div>
-              <div className="flex items-start gap-3 p-3 bg-muted/50 rounded-lg">
-                <MapPin className="h-5 w-5 text-primary mt-0.5" />
-                <div>
-                  <p className="text-sm text-muted-foreground">Location</p>
-                  <p className="font-medium">
-                    {receptionist.city || "N/A"}, {receptionist.country || "N/A"}
-                  </p>
-                </div>
-              </div>
-              <div className="flex items-start gap-3 p-3 bg-muted/50 rounded-lg">
-                <Calendar className="h-5 w-5 text-primary mt-0.5" />
-                <div>
-                  <p className="text-sm text-muted-foreground">Joined</p>
-                  <p className="font-medium">{formatDate(receptionist.createdAt)}</p>
-                </div>
+              {/* Security Banner - Minimal */}
+              <div className="p-4 rounded-2xl bg-muted/20 border border-border flex items-center gap-4">
+                <CheckCircle2 className="h-5 w-5 text-foreground shrink-0" />
+                <p className="text-[12px] text-muted-foreground italic leading-tight">
+                  Staff actions are historically logged for compliance.
+                </p>
               </div>
             </div>
-
-            {/* Info Note */}
-            <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
-              <p className="text-sm text-blue-700 dark:text-blue-300">
-                <strong>Note:</strong> Your receptionist can log in with their email and password to manage 
-                appointments, view patient bookings, and help with your schedule.
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-      )}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

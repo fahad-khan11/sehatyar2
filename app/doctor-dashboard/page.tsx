@@ -39,6 +39,7 @@ const today = getFormattedDate(new Date());
 
 export default function DoctorDashboardPage() {
   const { user } = useAuth();
+  const [doctorName, setDoctorName] = useState<string>("");
   const [appointments, setAppointments] = useState<any[]>([]);
   const [patients, setPatients] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -50,10 +51,17 @@ export default function DoctorDashboardPage() {
       if (!doctorId) return;
       setLoading(true);
       try {
-        const [appData, patData] = await Promise.all([
+        const [appData, patData, drProfile] = await Promise.all([
           getAppointmentsForDoctor(),
-          import('@/lib/api/apis').then(m => m.getPatientsForDoctor())
+          import('@/lib/api/apis').then(m => m.getPatientsForDoctor()),
+          import('@/lib/api/apis').then(m => m.getIndividualDoctors()).catch(() => null)
         ]);
+
+        // Set doctor name from profile if available, otherwise from user context or email
+        const nameFromProfile = drProfile?.fullName || drProfile?.user?.fullName || drProfile?.user?.name;
+        const emailPrefix = user?.email?.split('@')[0] || "";
+        setDoctorName(nameFromProfile || user?.fullName || user?.name || emailPrefix || "Doctor");
+
         let arr = Array.isArray(appData) ? appData : (Array.isArray(appData?.upcomingAppointments) ? appData.upcomingAppointments : (Array.isArray(appData?.appointments) ? appData.appointments : []));
         setAppointments(arr);
         setPatients(Array.isArray(patData) ? patData : (patData?.data || []));
@@ -85,7 +93,7 @@ export default function DoctorDashboardPage() {
     >
       <main className="flex-1 space-y-6 pb-6 w-full">
         <div className="flex flex-col space-y-2">
-          <h2 className="text-2xl lg:text-3xl font-bold tracking-tight">Welcome back, Dr. {user?.name?.split(' ')[0] || "Sarah"}</h2>
+          <h2 className="text-2xl lg:text-3xl font-bold tracking-tight">Welcome back, Dr. {doctorName.split(' ')[0] || "Doctor"}</h2>
           <p className="text-muted-foreground">Here's what's happening with your patients today.</p>
         </div>
 
@@ -288,9 +296,8 @@ export default function DoctorDashboardPage() {
             </CardContent>
         </Card>
       </div>
-
+{/* 
       <div className="w-full">
-        {/* Calendar View Card */}
         <Card className="w-full shadow-sm border-blue-100 dark:border-blue-900/40">
           <CardHeader>
             <CardTitle>Calendar View</CardTitle>
@@ -298,7 +305,6 @@ export default function DoctorDashboardPage() {
           </CardHeader>
           <CardContent className="h-[430px] flex flex-col">
             <div className="flex flex-col h-full space-y-4">
-              {/* Horizontal scroll for days */}
               <div className="flex items-center gap-3">
                 <Button variant="ghost" size="icon" className="h-[38px] w-[38px] rounded-full bg-slate-100 dark:bg-[#1e293b] hover:bg-slate-200 dark:hover:bg-[#334155] flex-shrink-0" onClick={() => {
                     const currentIndex = allDays.findIndex(d => d.value === selectedDate);
@@ -382,7 +388,7 @@ export default function DoctorDashboardPage() {
             </div>
           </CardContent>
         </Card>
-      </div>
+      </div> */}
 
       </main>
     </div>

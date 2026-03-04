@@ -244,11 +244,11 @@ export const getPatientsByClinic = async () => {
   }
 };
 
-export const createPatientForClinic = async (payload: any) => {
+export const createPatientForClinic = async (payload: FormData) => {
   try {
-    const response = await axios.post(`${BASE_URL}users/by/clinic`, payload, {
+    const response = await axios.post(`${BASE_URL}users/created/By`, payload, {
       headers: {
-        "Content-Type": "application/json",
+        "Content-Type": "multipart/form-data",
         Authorization: `Bearer ${localStorage.getItem("access_token")}`,
       },
     });

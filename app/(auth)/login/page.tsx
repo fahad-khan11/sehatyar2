@@ -65,10 +65,14 @@ const LoginPage = () => {
                  id: response.id,
                  email: response.email,
                  role: response.role,
-                 doctorId: response.doctorId
+                 doctorId: response.doctorId,
+                 fullName: response.fullName || response.name,
+                 name: response.name || response.fullName
              };
-         } else if (user && response.doctorId) {
-             user.doctorId = response.doctorId;
+         } else if (user) {
+             if (response.doctorId) user.doctorId = response.doctorId;
+             if (!user.fullName) user.fullName = response.fullName || response.name;
+             if (!user.name) user.name = response.name || response.fullName;
          }
          
          if (user) {
