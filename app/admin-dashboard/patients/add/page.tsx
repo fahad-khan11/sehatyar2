@@ -7,47 +7,69 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ArrowLeft, Loader2 } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { createPatient } from "@/lib/api/apis";
-import { toast, useToast } from "@/hooks/use-toast";
+import { toast } from "sonner";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import * as z from "zod";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+
+const formSchema = z.object({
+  fullName: z.string().min(2, "Full name must be at least 2 characters."),
+  gender: z.string().min(1, "Gender is required."),
+  email: z.string().email("Please enter a valid email address."),
+  address: z.string().optional(),
+  country: z.string().min(1, "Country is required."),
+  city: z.string().min(1, "City is required."),
+  phoneNumber: z
+    .string()
+    .min(10, "Phone number must be at least 10 characters.")
+    .regex(/^\+?\d+$/, "Phone number must only contain digits (and optional leading +)."),
+  password: z.string().min(6, "Password must be at least 6 characters."),
+});
+
+type FormValues = z.infer<typeof formSchema>;
 
 export default function AddPatientPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
-  const [formData, setFormData] = useState({
-    fullName: "",
-    gender: "",
-    email: "",
-    address: "",
-    country: "",
-    city: "",
-    phoneNumber: "",
-    password: "",
+
+  const form = useForm<FormValues>({
+    resolver: zodResolver(formSchema),
+    mode: "onChange",
+    defaultValues: {
+      fullName: "",
+      gender: "",
+      email: "",
+      address: "",
+      country: "",
+      city: "",
+      phoneNumber: "",
+      password: "",
+    },
   });
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { id, value } = e.target;
-    setFormData((prev) => ({ ...prev, [id]: value }));
-  };
+  const { formState } = form;
+  const isFormInvalid = !formState.isValid;
 
-  const handleSelectChange = (value: string, id: string) => {
-    setFormData((prev) => ({ ...prev, [id]: value }));
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const onSubmit = async (values: FormValues) => {
     setLoading(true);
     try {
-      await createPatient(formData);
+      await createPatient(values);
+      toast.success("Patient registered successfully!");
       router.push("/admin-dashboard/patients");
-    } catch (error) {
+    } catch (error: any) {
       console.error("Failed to create patient", error);
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Failed to create patient. Please try again.",
-      });
+      toast.error(error?.response?.data?.message || "Failed to create patient. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -71,112 +93,149 @@ export default function AddPatientPage() {
       <Card>
         <CardHeader>
           <CardTitle>Patient Information</CardTitle>
-          <CardDescription>Enter the patient's details below.</CardDescription>
+          <CardDescription>
+            Enter the patient's details below. Fields marked with <span className="text-red-500">*</span> are required.
+          </CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="space-y-2">
-              <Label htmlFor="fullName">Full Name</Label>
-              <Input
-                id="fullName"
-                placeholder="Enter full name"
-                value={formData.fullName}
-                onChange={handleChange}
-                required
-              />
-            </div>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <FormField
+                  control={form.control}
+                  name="fullName"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Full Name <span className="text-red-500">*</span></FormLabel>
+                      <FormControl>
+                        <Input placeholder="Enter full name" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-            <div className="space-y-2">
-              <Label htmlFor="gender">Gender</Label>
-              <Select onValueChange={(value) => handleSelectChange(value, "gender")} required>
-                <SelectTrigger id="gender">
-                  <SelectValue placeholder="Select gender" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="male">Male</SelectItem>
-                  <SelectItem value="female">Female</SelectItem>
-                  <SelectItem value="other">Other</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+                <FormField
+                  control={form.control}
+                  name="gender"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Gender <span className="text-red-500">*</span></FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select gender" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="male">Male</SelectItem>
+                          <SelectItem value="female">Female</SelectItem>
+                          {/* <SelectItem value="other">Other</SelectItem> */}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="Enter email"
-                value={formData.email}
-                onChange={handleChange}
-                required
-              />
-            </div>
+                <FormField
+                  control={form.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Email <span className="text-red-500">*</span></FormLabel>
+                      <FormControl>
+                        <Input type="email" placeholder="Enter email" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-            <div className="space-y-2">
-              <Label htmlFor="address">Address</Label>
-              <Input
-                id="address"
-                placeholder="Enter address"
-                value={formData.address}
-                onChange={handleChange}
-              />
-            </div>
+                <FormField
+                  control={form.control}
+                  name="phoneNumber"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Phone Number <span className="text-red-500">*</span></FormLabel>
+                      <FormControl>
+                        <Input placeholder="Enter phone number" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-            <div className="space-y-2">
-              <Label htmlFor="country">Country</Label>
-              <Input
-                id="country"
-                placeholder="Enter country"
-                value={formData.country}
-                onChange={handleChange}
-                required
-              />
-            </div>
+                <FormField
+                  control={form.control}
+                  name="country"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Country <span className="text-red-500">*</span></FormLabel>
+                      <FormControl>
+                        <Input placeholder="Enter country" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-            <div className="space-y-2">
-              <Label htmlFor="city">City</Label>
-              <Input
-                id="city"
-                placeholder="Enter city"
-                value={formData.city}
-                onChange={handleChange}
-                required
-              />
-            </div>
+                <FormField
+                  control={form.control}
+                  name="city"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>City <span className="text-red-500">*</span></FormLabel>
+                      <FormControl>
+                        <Input placeholder="Enter city" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-            <div className="space-y-2">
-              <Label htmlFor="phoneNumber">Phone Number</Label>
-              <Input
-                id="phoneNumber"
-                placeholder="Enter phone number"
-                value={formData.phoneNumber}
-                onChange={handleChange}
-                required
-              />
-            </div>
+                <div className="md:col-span-2">
+                  <FormField
+                    control={form.control}
+                    name="address"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Address</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Enter address" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
-              <Input
-                id="password"
-                type="password"
-                placeholder="Enter password"
-                value={formData.password}
-                onChange={handleChange}
-                required
-              />
-            </div>
+                <FormField
+                  control={form.control}
+                  name="password"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Password <span className="text-red-500">*</span></FormLabel>
+                      <FormControl>
+                        <Input type="password" placeholder="Min. 6 characters" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
 
-            <div className="flex justify-end gap-4">
-              <Button type="button" variant="outline" asChild>
-                <Link href="/admin-dashboard/patients">Cancel</Link>
-              </Button>
-              <Button type="submit" disabled={loading}>
-                {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                Register Patient
-              </Button>
-            </div>
-          </form>
+              <div className="flex justify-end gap-4">
+                <Button type="button" variant="outline" asChild>
+                  <Link href="/admin-dashboard/patients">Cancel</Link>
+                </Button>
+                <Button type="submit" disabled={loading || isFormInvalid}>
+                  {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                  Register Patient
+                </Button>
+              </div>
+            </form>
+          </Form>
         </CardContent>
       </Card>
     </div>

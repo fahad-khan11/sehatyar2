@@ -1,5 +1,6 @@
 "use client";
 
+import * as React from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
@@ -21,27 +22,23 @@ import { useRouter } from "next/navigation";
 import { createClinic } from "@/lib/api/apis";
 
 const formSchema = z.object({
-  name: z.string().min(2, {
-    message: "Clinic name must be at least 2 characters.",
-  }),
-  address: z.string().min(5, {
-    message: "Address must be at least 5 characters.",
-  }),
-  phone: z.string().min(10, {
-    message: "Phone number must be at least 10 characters.",
-  }),
-  email: z.string().email({
-    message: "Please enter a valid email address.",
-  }),
-  password: z.string().min(6, {
-    message: "Password must be at least 6 characters.",
-  }),
+  name: z.string().min(2, "Clinic name must be at least 2 characters."),
+  address: z.string().min(5, "Address must be at least 5 characters."),
+  phone: z
+    .string()
+    .min(10, "Phone number must be at least 10 characters.")
+    .regex(/^\+?\d+$/, "Phone number must only contain digits (and optional leading +)."),
+  email: z.string().email("Please enter a valid email address."),
+  password: z.string().min(6, "Password must be at least 6 characters."),
 });
 
 export default function AddClinicPage() {
   const router = useRouter();
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
+    mode: "onChange",
     defaultValues: {
       name: "",
       address: "",
@@ -52,6 +49,7 @@ export default function AddClinicPage() {
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
+    setIsSubmitting(true);
     try {
       await createClinic({ ...values, isDoctorClinic: false });
       toast.success("Clinic added successfully!");
@@ -59,6 +57,8 @@ export default function AddClinicPage() {
     } catch (error) {
       console.error(error);
       toast.error("Failed to add clinic. Please try again.");
+    } finally {
+      setIsSubmitting(false);
     }
   }
 
@@ -80,7 +80,7 @@ export default function AddClinicPage() {
         <CardHeader>
           <CardTitle>Clinic Details</CardTitle>
           <CardDescription>
-            Fill in the form below to register a new clinic location.
+            Fill in the form below to register a new clinic location. Fields marked with <span className="text-destructive">*</span> are required.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -91,7 +91,7 @@ export default function AddClinicPage() {
                 name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Clinic Name</FormLabel>
+                    <FormLabel>Clinic Name <span className="text-destructive">*</span></FormLabel>
                     <FormControl>
                       <Input placeholder="e.g. Central City Clinic" {...field} />
                     </FormControl>
@@ -104,7 +104,7 @@ export default function AddClinicPage() {
                 name="address"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Clinic Address</FormLabel>
+                    <FormLabel>Clinic Address <span className="text-destructive">*</span></FormLabel>
                     <FormControl>
                       <Input placeholder="e.g. 123 Main St, New York, NY" {...field} />
                     </FormControl>
@@ -117,9 +117,9 @@ export default function AddClinicPage() {
                 name="email"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Clinic Email</FormLabel>
+                    <FormLabel>Clinic Email <span className="text-destructive">*</span></FormLabel>
                     <FormControl>
-                      <Input placeholder="e.g. contact@clinic.com" {...field} />
+                      <Input type="email" placeholder="e.g. contact@clinic.com" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -130,7 +130,7 @@ export default function AddClinicPage() {
                 name="phone"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Clinic Phone</FormLabel>
+                    <FormLabel>Clinic Phone <span className="text-destructive">*</span></FormLabel>
                     <FormControl>
                       <Input placeholder="e.g. +1 (555) 123-4567" {...field} />
                     </FormControl>
@@ -143,7 +143,7 @@ export default function AddClinicPage() {
                 name="password"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Clinic Password</FormLabel>
+                    <FormLabel>Clinic Password <span className="text-destructive">*</span></FormLabel>
                     <FormControl>
                       <Input type="password" placeholder="Enter password" {...field} />
                     </FormControl>
@@ -154,11 +154,13 @@ export default function AddClinicPage() {
 
               <div className="flex justify-end gap-2">
                 <Link href="/admin-dashboard/clinics">
-                  <Button variant="outline" type="button">
+                  <Button variant="outline" type="button" disabled={isSubmitting}>
                     Cancel
                   </Button>
                 </Link>
-                <Button type="submit">Add Clinic</Button>
+                <Button type="submit" disabled={isSubmitting}>
+                  {isSubmitting ? "Adding..." : "Add Clinic"}
+                </Button>
               </div>
             </form>
           </Form>

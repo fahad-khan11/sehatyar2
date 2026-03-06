@@ -473,6 +473,8 @@ export default function AddDoctorPage() {
     if (!userFields.password.trim()) newErrors.password = "Password is required";
     if (!doctorData.yearsOfExperience.trim()) newErrors.yearsOfExperience = "Experience is required";
     if (doctorData.primarySpecializations.length === 0) newErrors.primarySpecializations = "At least one specialization is required";
+    if (doctorData.servicesTreatment.length === 0) newErrors.servicesTreatment = "At least one service/treatment is required";
+    if (!doctorData.FeesPerConsultation.trim()) newErrors.FeesPerConsultation = "Consultation fee is required";
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
@@ -532,6 +534,21 @@ export default function AddDoctorPage() {
     }
   };
 
+  const isFormInvalid = useMemo(() => {
+    return (
+      !userFields.fullName.trim() ||
+      !userFields.email.trim() ||
+      !userFields.city.trim() ||
+      !userFields.password.trim() ||
+      !userFields.confirmPassword.trim() ||
+      !doctorData.yearsOfExperience.trim() ||
+      !doctorData.FeesPerConsultation.trim() ||
+      doctorData.primarySpecializations.length === 0 ||
+      doctorData.servicesTreatment.length === 0 ||
+      Object.keys(errors).length > 0
+    );
+  }, [userFields, doctorData, errors]);
+
   return (
     <div className="flex flex-col gap-5">
       <div className="flex items-center gap-4">
@@ -569,8 +586,15 @@ export default function AddDoctorPage() {
                     placeholder="Enter full name" 
                     value={userFields.fullName}
                     onChange={(e) => {
-                      setUserFields({ ...userFields, fullName: e.target.value });
-                      if (errors.fullName) setErrors(prev => { const n = {...prev}; delete n.fullName; return n; });
+                      const val = e.target.value;
+                      setUserFields({ ...userFields, fullName: val });
+                      if (!val.trim()) {
+                        setErrors(prev => ({ ...prev, fullName: "Full Name is required" }));
+                      } else if (val.trim().length < 2) {
+                        setErrors(prev => ({ ...prev, fullName: "Full Name must be at least 2 characters" }));
+                      } else {
+                        setErrors(prev => { const n = {...prev}; delete n.fullName; return n; });
+                      }
                     }}
                     className={errors.fullName ? "border-red-500" : ""}
                   />
@@ -637,32 +661,64 @@ export default function AddDoctorPage() {
                     placeholder="doctor@example.com" 
                     value={userFields.email}
                     onChange={(e) => {
-                      setUserFields({ ...userFields, email: e.target.value });
-                      if (errors.email) setErrors(prev => { const n = {...prev}; delete n.email; return n; });
+                      const val = e.target.value;
+                      setUserFields({ ...userFields, email: val });
+                      if (!val.trim()) {
+                        setErrors(prev => ({ ...prev, email: "Email is required" }));
+                      } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val)) {
+                        setErrors(prev => ({ ...prev, email: "Invalid email format" }));
+                      } else {
+                        setErrors(prev => { const n = {...prev}; delete n.email; return n; });
+                      }
                     }}
                     className={errors.email ? "border-red-500" : ""}
                   />
                   {errors.email && <p className="text-xs text-red-500">{errors.email}</p>}
                 </div>
 
-                <div className="space-y-2 text-primary">
+                <div className="space-y-2">
                   <Label>Phone Number</Label>
                   <Input 
                     placeholder="+92 300 1234567" 
                     value={userFields.phoneNumber}
-                    onChange={(e) => setUserFields({ ...userFields, phoneNumber: e.target.value })}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      setUserFields({ ...userFields, phoneNumber: val });
+                      
+                      // Improved regex to allow typing the plus sign without immediate error
+                      if (val && !/^\+?\d*$/.test(val)) {
+                        setErrors(prev => ({ ...prev, phoneNumber: "Phone number digits only (optional leading +)." }));
+                      } else if (val && val.length > 1 && val.length < 10) {
+                        setErrors(prev => ({ ...prev, phoneNumber: "Phone number must be at least 10 digits." }));
+                      } else {
+                        setErrors(prev => {
+                          const newErrs = { ...prev };
+                          delete newErrs.phoneNumber;
+                          return newErrs;
+                        });
+                      }
+                    }}
+                    className={errors.phoneNumber ? "border-red-500" : ""}
                   />
+                  {errors.phoneNumber && <p className="text-xs text-red-500">{errors.phoneNumber}</p>}
                 </div>
 
                 <div className="space-y-2">
                   <Label>Password <span className="text-red-500">*</span></Label>
                   <Input 
                     type="password" 
-                    placeholder="Min. 8 characters" 
+                    placeholder="Min. 6 characters" 
                     value={userFields.password}
                     onChange={(e) => {
-                      setUserFields({ ...userFields, password: e.target.value });
-                      if (errors.password) setErrors(prev => { const n = {...prev}; delete n.password; return n; });
+                      const val = e.target.value;
+                      setUserFields({ ...userFields, password: val });
+                      if (!val) {
+                        setErrors(prev => ({ ...prev, password: "Password is required" }));
+                      } else if (val.length < 6) {
+                        setErrors(prev => ({ ...prev, password: "Password must be at least 6 characters" }));
+                      } else {
+                        setErrors(prev => { const n = {...prev}; delete n.password; return n; });
+                      }
                     }}
                     className={errors.password ? "border-red-500" : ""}
                   />
@@ -676,8 +732,13 @@ export default function AddDoctorPage() {
                     placeholder="Repeat password" 
                     value={userFields.confirmPassword}
                     onChange={(e) => {
-                      setUserFields({ ...userFields, confirmPassword: e.target.value });
-                      if (errors.confirmPassword) setErrors(prev => { const n = {...prev}; delete n.confirmPassword; return n; });
+                      const val = e.target.value;
+                      setUserFields({ ...userFields, confirmPassword: val });
+                      if (val !== userFields.password) {
+                        setErrors(prev => ({ ...prev, confirmPassword: "Passwords do not match" }));
+                      } else {
+                        setErrors(prev => { const n = {...prev}; delete n.confirmPassword; return n; });
+                      }
                     }}
                     className={errors.confirmPassword ? "border-red-500" : ""}
                   />
@@ -747,7 +808,7 @@ export default function AddDoctorPage() {
 
                 <div className="col-span-1 md:col-span-2 space-y-4">
                   <AutocompleteField
-                  label="Primary Specializations"
+                  label={<span>Primary Specializations <span className="text-red-500">*</span></span>}
                   placeholder="Start typing..."
                   fieldName="primarySpecializations"
                   allOptions={SPECIALIZATIONS}
@@ -758,14 +819,14 @@ export default function AddDoctorPage() {
                   setDropdownOpen={(open) => setOpenDropdown(open ? "specializations" : null)}
                   addItem={(f, v) => {
                     addItem(f, v);
-                    if (errors.primarySpecializations) setErrors(prev => { const n = {...prev}; delete n.primarySpecializations; return n; });
+                    setErrors(prev => { const n = {...prev}; delete n.primarySpecializations; return n; });
                   }}
                   removeItem={removeItem}
                   error={errors.primarySpecializations}
                 />
 
                   <AutocompleteField
-                    label="Services / Treatments Offered"
+                    label={<span>Services / Treatments Offered <span className="text-red-500">*</span></span>}
                     placeholder="Start typing..."
                     inputValue={treatmentInput}
                     setInputValue={setTreatmentInput}
@@ -776,7 +837,7 @@ export default function AddDoctorPage() {
                     setDropdownOpen={(open: boolean) => setOpenDropdown(open ? "treatment" : null)}
                     addItem={(f, v) => {
                       addItem(f, v);
-                      if (errors.servicesTreatment) setErrors(prev => { const n = {...prev}; delete n.servicesTreatment; return n; });
+                      setErrors(prev => { const n = {...prev}; delete n.servicesTreatment; return n; });
                     }}
                     removeItem={removeItem}
                     error={errors.servicesTreatment}
@@ -802,13 +863,30 @@ export default function AddDoctorPage() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label>Fees per Consultation (PKR)</Label>
+                  <Label>Fees per Consultation (PKR) <span className="text-red-500">*</span></Label>
                   <Input 
                     type="number"
                     placeholder="1000"
                     value={doctorData.FeesPerConsultation}
-                    onChange={(e) => setDoctorData(prev => ({ ...prev, FeesPerConsultation: e.target.value }))}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      setDoctorData(prev => ({ ...prev, FeesPerConsultation: val }));
+                      
+                      if (!val) {
+                        setErrors(prev => ({ ...prev, FeesPerConsultation: "Consulation fee is required." }));
+                      } else if (!/^\d+$/.test(val)) {
+                        setErrors(prev => ({ ...prev, FeesPerConsultation: "Fees must be a valid number." }));
+                      } else {
+                        setErrors(prev => {
+                          const newErrs = { ...prev };
+                          delete newErrs.FeesPerConsultation;
+                          return newErrs;
+                        });
+                      }
+                    }}
+                    className={errors.FeesPerConsultation ? "border-red-500" : ""}
                   />
+                  {errors.FeesPerConsultation && <p className="text-xs text-red-500">{errors.FeesPerConsultation}</p>}
                 </div>
 
                 <div className="col-span-1 md:col-span-2 space-y-2">
@@ -844,7 +922,7 @@ export default function AddDoctorPage() {
 
       <div className="flex justify-end gap-4 mt-6">
         <Button variant="outline" onClick={() => router.back()}>Cancel</Button>
-        <Button onClick={handleRegister} disabled={loading}>
+        <Button onClick={handleRegister} disabled={loading || isFormInvalid}>
           {loading ? "Submitting..." : "Save Doctor"}
         </Button>
       </div>
@@ -908,7 +986,7 @@ function AutocompleteField({
   removeItem,
   error,
 }: {
-  label: string;
+  label: React.ReactNode;
   placeholder: string;
   inputValue: string;
   setInputValue: (value: string) => void;
